@@ -3,6 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Modules\HarmoView\Controllers\HarmoViewController;
 
-Route::middleware(['web', 'auth', 'role:wali'])->group(function () {
+
     Route::get('/harmoview/compare', [HarmoViewController::class, 'compare']);
-});
+

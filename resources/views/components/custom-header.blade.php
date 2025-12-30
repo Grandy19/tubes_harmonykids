@@ -103,7 +103,7 @@
         position: absolute;
         top: 35px;
         left: 10px;
-        width: 65px;
+        width: 40px;
         transform: rotate(-5.7deg); /* -0.1 radian */
         z-index: 6;
     }
@@ -135,7 +135,7 @@
         <div class="header-capsule">
             
             {{-- TOMBOL BACK --}}
-            <button onclick="history.back()" class="btn-back">
+            <button onclick="window.location.href='{{ route('wali.home') }}'" class="btn-back">
                 <i class="fa-solid fa-chevron-left icon-back"></i>
             </button>
 

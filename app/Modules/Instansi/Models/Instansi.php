@@ -3,8 +3,7 @@
 namespace App\Modules\Instansi\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Modules\Instansi\Models\InstansiProfile;
-use App\Modules\Instansi\Models\InstansiGallery;
+use App\Models\User;
 
 class Instansi extends Model
 {
@@ -18,9 +17,11 @@ class Instansi extends Model
         'telepon',
         'email',
         'status',
-        'bakat',
-        'is_verified',
     ];
+
+    // =====================
+    // RELATIONS
+    // =====================
 
     public function profile()
     {
@@ -30,5 +31,11 @@ class Instansi extends Model
     public function galleries()
     {
         return $this->hasMany(InstansiGallery::class);
+    }
+
+    // 🔥 RELASI YANG KEMARIN HILANG
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'pengelola_id');
     }
 }

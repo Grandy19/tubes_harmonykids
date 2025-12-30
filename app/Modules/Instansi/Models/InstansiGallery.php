@@ -10,6 +10,7 @@ class InstansiGallery extends Model
         'instansi_id',
         'image_path',
         'category',
+        'caption',
     ];
 
     public function instansi()

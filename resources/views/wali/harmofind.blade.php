@@ -1,30 +1,100 @@
-<x-mobile-app title="Cari Sekolah" :withNavbar="true">
+<x-mobile-app title="HarmoFind" :withNavbar="true">
 
     @push('styles')
     <style>
         /* --- LAYOUT UTAMA --- */
         .header-layer { position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
         .floating-area { position: absolute; top: 220px; left: 0; right: 0; z-index: 20; padding: 0 24px; }
+        
+        /* Padding top disesuaikan agar konten awal tidak tertutup filter */
         .content-scroll {
-            padding-top: 380px; padding-left: 24px; padding-right: 24px; padding-bottom: 120px; min-height: 100vh;
+            padding-top: 380px; 
+            padding-left: 24px; 
+            padding-right: 24px; 
+            padding-bottom: 120px; 
+            min-height: 100vh;
         }
 
-        /* --- DROPDOWN & FILTER --- */
-        .location-box { background: white; border-radius: 20px; box-shadow: 0 10px 20px rgba(53, 119, 229, 0.15); position: relative; z-index: 50; }
-        .loc-header { padding: 18px 20px; display: flex; align-items: center; cursor: pointer; }
-        .loc-list { display: none; border-top: 1px solid #f0f0f0; }
-        .loc-item { padding: 16px 20px; font-weight: 600; font-size: 15px; color: #2A2A2A; cursor: pointer; transition: background 0.2s; }
+        /* --- DROPDOWN LOKASI (FIXED) --- */
+        .location-box { 
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 20px rgba(53, 119, 229, 0.15); 
+            position: relative; /* Penting sebagai acuan absolute child */
+            z-index: 50; 
+        }
+
+        .loc-header { 
+            padding: 18px 20px; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer; 
+        }
+
+        /* PERBAIKAN: Gunakan absolute agar mengambang */
+        .loc-list { 
+            display: none; 
+            position: absolute; 
+            top: 100%; /* Tepat di bawah header */
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border-radius: 0 0 20px 20px; /* Lengkungan bawah saja */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+            border-top: 1px solid #f0f0f0; 
+            z-index: 100; /* Layer paling atas */
+            overflow: hidden;
+        }
+
+        .loc-item { 
+            padding: 16px 20px; 
+            font-weight: 600; 
+            font-size: 15px; 
+            color: #2A2A2A; 
+            cursor: pointer; 
+            transition: background 0.2s; 
+        }
         .loc-item:hover { background: #f8f9fa; }
+
+        /* Saat aktif, list muncul & sudut bawah header jadi kotak */
         .location-box.active .loc-list { display: block; }
+        .location-box.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
 
-        .cat-btn { background: white; color: #3577E5; padding: 10px; width: 100px; text-align: center; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+        /* --- BUTTON KATEGORI --- */
+        .cat-btn { 
+            background: white; color: #3577E5; padding: 10px; width: 100px; 
+            text-align: center; border-radius: 12px; font-weight: 700; font-size: 14px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; 
+            border: 1px solid transparent; 
+        }
         .cat-btn:active { transform: scale(0.95); }
-        .cat-btn.active { background: #3577E5; color: white; box-shadow: 0 6px 15px rgba(53, 119, 229, 0.3); }
+        .cat-btn.active { 
+            background: #3577E5; color: white; 
+            box-shadow: 0 6px 15px rgba(53, 119, 229, 0.3); 
+        }
 
-        .sort-box { background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; min-width: 140px; z-index: 40; }
-        .sort-header { padding: 10px 14px; display: flex; align-items: center; cursor: pointer; justify-content: space-between; }
-        .sort-list { display: none; position: absolute; top: 105%; right: 0; width: 100%; background: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .sort-item { padding: 12px 14px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f9f9f9; color: #333; font-weight: 500; }
+        /* --- SORT BOX --- */
+        .sort-box { 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; 
+            min-width: 140px; z-index: 40; 
+        }
+        .sort-header { 
+            padding: 10px 14px; display: flex; align-items: center; 
+            cursor: pointer; justify-content: space-between; 
+        }
+        .sort-list { 
+            display: none; position: absolute; top: 105%; right: 0; width: 100%; 
+            background: white; border-radius: 15px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; 
+        }
+        .sort-item { 
+            padding: 12px 14px; font-size: 13px; cursor: pointer; 
+            border-bottom: 1px solid #f9f9f9; color: #333; font-weight: 500; 
+        }
         .sort-item:last-child { border-bottom: none; }
         .sort-item:hover { background: #f0f7ff; color: #3577E5; }
         .sort-box.active .sort-list { display: block; }
@@ -51,7 +121,7 @@
 
     {{-- LAYER 1: HEADER --}}
     <div class="header-layer">
-        <x-custom-header title="Cari Sekolah" />
+        <x-custom-header title="HarmoFind" />
     </div>
 
     {{-- LAYER 2: FILTER --}}
@@ -66,7 +136,7 @@
             </div>
             <div class="loc-list">
                 <div class="loc-item" onclick="selectLocation('Bandung')">Bandung</div>
-                <div class="loc-item" onclick="selectLocation('Kota Bekasi')">Bekasi</div>
+                <div class="loc-item" onclick="selectLocation('Bekasi')">Bekasi</div>
                 <div class="loc-item" onclick="selectLocation('Surabaya')">Surabaya</div>
             </div>
         </div>

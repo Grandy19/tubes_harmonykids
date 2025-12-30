@@ -1,265 +1,224 @@
 <x-mobile-app title="Edit Akun" :withNavbar="true">
 
-    @push('styles')
-    <style>
-        .header-curve {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 180px;
-            background: #1A73E8;
-            border-bottom-left-radius: 40px;
-            border-bottom-right-radius: 40px;
-            z-index: 0;
-        }
+@push('styles')
+<style>
+.header-layer{position:absolute;top:0;left:0;right:0;z-index:10}
 
-        .content-area {
-            position: relative;
-            z-index: 1;
-            padding: 0 24px 120px 24px;
-        }
+.content-scroll{
+    padding:120px 24px 100px;
+    min-height:100vh;
+    background:#F9FCFD;
+}
 
-        .profile-wrapper {
-            position: relative;
-            margin-top: 100px;
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: center;
-        }
+/* FOTO PROFIL */
+.profile-img-container{
+    position:relative;
+    width:110px;
+    height:110px;
+    margin:0 auto 32px;
+}
+.profile-img{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid white;
+    box-shadow:0 8px 15px rgba(26,115,232,.3);
+    background:#D8D5EA;
+}
+.edit-icon-badge{
+    position:absolute;
+    bottom:0;
+    right:0;
+    width:35px;
+    height:35px;
+    background:#1A73E8;
+    border-radius:50%;
+    border:2px solid white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+.edit-icon-badge i{color:white;font-size:16px}
 
-        .avatar-box {
-            width: 110px;
-            height: 110px;
-            background: #D8D5EA;
-            border-radius: 50%;
-            border: 4px solid white;
-            box-shadow: 0 8px 15px rgba(26,115,232,0.3);
-            overflow: hidden;
-            position: relative;
-        }
+/* INPUT */
+.input-group-custom{
+    background:white;
+    border-radius:15px;
+    height:60px;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    margin-bottom:20px;
+    box-shadow:0 6px 10px rgba(0,0,0,.04);
+}
+.input-group-custom:focus-within{
+    box-shadow:0 10px 15px rgba(26,115,232,.15);
+    transform:translateY(-2px);
+}
+.input-icon{
+    width:30px;
+    font-size:24px;
+    color:#1A73E8;
+    margin-right:16px;
+    text-align:center;
+}
+.form-control-custom{
+    flex:1;
+    border:none;
+    outline:none;
+    font-size:16px;
+    font-weight:700;
+    color:#1A73E8;
+    background:transparent;
+}
+.form-control-custom::placeholder{
+    color:rgba(26,115,232,.6);
+}
+.edit-suffix{
+    font-size:18px;
+    color:rgba(26,115,232,.4);
+}
 
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+/* BUTTON */
+.btn-save{
+    width:100%;
+    height:55px;
+    background:white;
+    border:none;
+    border-radius:15px;
+    font-size:18px;
+    font-weight:800;
+    color:#0F3974;
+    box-shadow:0 10px 0 #D8D5EA;
+}
+.btn-save:active{
+    transform:translateY(4px);
+    box-shadow:0 6px 0 #D8D5EA;
+}
 
-        .edit-badge {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 35px;
-            height: 35px;
-            background: #1A73E8;
-            border: 2px solid white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
+/* SELECT */
+select.form-control-custom{
+    appearance:none;
+    cursor:pointer;
+}
+</style>
+@endpush
 
-        .input-group-custom {
-            background: white;
-            height: 60px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            margin-bottom: 20px;
-        }
+{{-- HEADER --}}
+<div class="header-layer">
+    <x-custom-header title="Edit Akun" />
+</div>
 
-        .input-icon {
-            color: #1A73E8;
-            font-size: 24px;
-            margin-right: 15px;
-            min-width: 30px;
-            text-align: center;
-        }
+{{-- CONTENT --}}
+<div class="content-scroll">
 
-        .form-control-custom {
-            border: none;
-            outline: none;
-            width: 100%;
-            color: #1A73E8;
-            font-weight: 700;
-            font-size: 16px;
-            background: transparent;
-        }
+<form action="{{ route('wali.profile.update') }}" method="POST" enctype="multipart/form-data">
+@csrf
+@method('PUT')
 
-        .form-control-custom::placeholder {
-            color: rgba(26,115,232,0.6);
-        }
+{{-- FOTO PROFIL --}}
+@php
+$user = Auth::user();
+$photo = ($user && $user->foto_profil)
+    ? asset('storage/'.$user->foto_profil)
+    : asset('assets/images/default_avatar.png');
+@endphp
 
-        .edit-icon {
-            color: rgba(26,115,232,0.4);
-            font-size: 16px;
-        }
+<div class="profile-img-container" onclick="document.getElementById('fotoInput').click()">
+    <img src="{{ $photo }}" class="profile-img" id="previewImg">
+    <div class="edit-icon-badge"><i class="fa-solid fa-pen"></i></div>
+    <input type="file" id="fotoInput" name="foto_profil" hidden accept="image/*" onchange="previewImage(this)">
+</div>
 
-        .btn-save {
-            width: 100%;
-            height: 50px;
-            background: white;
-            color: #0F3974;
-            font-weight: 800;
-            font-size: 18px;
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 10px 0 #D8D5EA;
-            margin-top: 20px;
-        }
+{{-- INPUT LIST --}}
+{{-- Change this block --}}
+<div class="input-group-custom">
+    <i class="fa-solid fa-user input-icon"></i>
+    <input type="text" name="name" class="form-control-custom"
+           value="{{ old('name', $user->name ?? '') }}" placeholder="Nama Lengkap" required>
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-        .btn-save:active {
-            transform: translateY(4px);
-            box-shadow: 0 6px 0 #D8D5EA;
-        }
-    </style>
-    @endpush
+<div class="input-group-custom">
+    <i class="fa-solid fa-envelope input-icon"></i>
+    <input type="email" name="email" class="form-control-custom"
+           value="{{ old('email', Auth::user()->email) }}" placeholder="Email" required>
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-    {{-- HEADER --}}
-    <div class="header-curve"></div>
+<div class="input-group-custom">
+    <i class="fa-solid fa-location-dot input-icon"></i>
+    <input type="text" name="alamat" class="form-control-custom"
+           value="{{ old('alamat', Auth::user()->alamat) }}" placeholder="Alamat">
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-    <div class="content-area">
+<div class="input-group-custom">
+    <i class="fa-solid fa-phone input-icon"></i>
+    <input type="text" name="no_telepon" class="form-control-custom"
+           value="{{ old('no_telepon', Auth::user()->no_telepon) }}" placeholder="Nomor Telepon">
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-        {{-- BACK --}}
-        <div class="d-flex align-items-center pt-4 mb-3">
-            <a href="{{ route('wali.home') }}" class="text-white me-3">
-                <i class="fa-solid fa-chevron-left fa-lg"></i>
-            </a>
-            <h1 class="text-white fw-bold fs-5 m-0">Edit Akun</h1>
-        </div>
+<div class="input-group-custom">
+    <i class="fa-solid fa-venus-mars input-icon" id="genderIcon"></i>
+    <select name="jenis_kelamin" class="form-control-custom" onchange="updateGenderIcon(this)">
+        <option value="">Jenis Kelamin</option>
+        <option value="Laki-laki" {{ Auth::user()->jenis_kelamin=='Laki-laki'?'selected':'' }}>Laki-laki</option>
+        <option value="Perempuan" {{ Auth::user()->jenis_kelamin=='Perempuan'?'selected':'' }}>Perempuan</option>
+    </select>
+    <i class="fa-solid fa-caret-down edit-suffix"></i>
+</div>
 
-        {{-- FORM --}}
-        <form action="{{ route('wali.profile.update') }}"
-              method="POST"
-              enctype="multipart/form-data">
+<div class="input-group-custom">
+    <i class="fa-solid fa-briefcase input-icon"></i>
+    <input type="text" name="pekerjaan" class="form-control-custom"
+           value="{{ old('pekerjaan', Auth::user()->pekerjaan) }}" placeholder="Pekerjaan">
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-            @csrf
-            @method('PUT')
+<div class="input-group-custom">
+    <i class="fa-solid fa-heart input-icon"></i>
+    <input type="text" name="hubungan_dengan_anak" class="form-control-custom"
+           value="{{ old('hubungan_dengan_anak', Auth::user()->hubungan_dengan_anak) }}" placeholder="Hubungan dengan anak">
+    <i class="fa-solid fa-pen edit-suffix"></i>
+</div>
 
-            {{-- FOTO PROFIL --}}
-            <div class="profile-wrapper">
-                <div class="avatar-box">
-                    @if(auth()->user()->foto_profil)
-                        <img id="previewImg"
-                             src="{{ asset('storage/' . auth()->user()->foto_profil) }}"
-                             class="avatar-img">
-                    @else
-                        <div class="d-flex align-items-center justify-content-center h-100">
-                            <i class="fa-solid fa-user fa-3x text-white"></i>
-                        </div>
-                    @endif
-                </div>
+<button type="submit" class="btn-save">Simpan</button>
 
-                <input type="file"
-                       name="foto_profil"
-                       id="fotoInput"
-                       hidden
-                       onchange="previewFile()">
+</form>
+</div>
 
-                <div class="edit-badge"
-                     onclick="document.getElementById('fotoInput').click()">
-                    <i class="fa-solid fa-pen"></i>
-                </div>
-            </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            {{-- INPUT --}}
-            <div class="input-group-custom">
-                <i class="fa-solid fa-user input-icon"></i>
-                <input type="text" name="name"
-                       value="{{ old('name', auth()->user()->name) }}"
-                       class="form-control-custom"
-                       placeholder="Nama Lengkap">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
+<script>
+function previewImage(input){
+    const file=input.files[0]
+    if(!file) return
+    const reader=new FileReader()
+    reader.onload=e=>document.getElementById('previewImg').src=e.target.result
+    reader.readAsDataURL(file)
+}
+function updateGenderIcon(sel){
+    const icon=document.getElementById('genderIcon')
+    icon.className='fa-solid input-icon'
+    if(sel.value==='Laki-laki') icon.classList.add('fa-mars')
+    else if(sel.value==='Perempuan') icon.classList.add('fa-venus')
+    else icon.classList.add('fa-venus-mars')
+}
 
-            <div class="input-group-custom">
-                <i class="fa-solid fa-envelope input-icon"></i>
-                <input type="email" name="email"
-                       value="{{ old('email', auth()->user()->email) }}"
-                       class="form-control-custom"
-                       placeholder="Email">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
-
-            <div class="input-group-custom">
-                <i class="fa-solid fa-location-dot input-icon"></i>
-                <input type="text" name="alamat"
-                       value="{{ old('alamat', auth()->user()->alamat) }}"
-                       class="form-control-custom"
-                       placeholder="Alamat">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
-
-            <div class="input-group-custom">
-                <i class="fa-solid fa-phone input-icon"></i>
-                <input type="text" name="phone"
-                       value="{{ old('phone', auth()->user()->phone) }}"
-                       class="form-control-custom"
-                       placeholder="Nomor Telepon">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
-
-            <div class="input-group-custom">
-                <i class="fa-solid fa-venus-mars input-icon"></i>
-                <select name="jenis_kelamin" class="form-control-custom">
-                    <option value="">Jenis Kelamin</option>
-                    <option value="Laki-laki" {{ auth()->user()->jenis_kelamin === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                    <option value="Perempuan" {{ auth()->user()->jenis_kelamin === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
-                </select>
-                <i class="fa-solid fa-caret-down edit-icon"></i>
-            </div>
-
-            <div class="input-group-custom">
-                <i class="fa-solid fa-briefcase input-icon"></i>
-                <input type="text" name="pekerjaan"
-                       value="{{ old('pekerjaan', auth()->user()->pekerjaan) }}"
-                       class="form-control-custom"
-                       placeholder="Pekerjaan">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
-
-            <div class="input-group-custom">
-                <i class="fa-solid fa-heart input-icon"></i>
-                <input type="text" name="hubungan"
-                       value="{{ old('hubungan', auth()->user()->hubungan) }}"
-                       class="form-control-custom"
-                       placeholder="Hubungan dengan Anak">
-                <i class="fa-solid fa-pen edit-icon"></i>
-            </div>
-
-            <button type="submit" class="btn-save">Simpan</button>
-
-        </form>
-    </div>
-
-    @push('scripts')
-    <script>
-        function previewFile() {
-            const file = document.getElementById('fotoInput').files[0];
-            const preview = document.getElementById('previewImg');
-
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = e => preview.src = e.target.result;
-            reader.readAsDataURL(file);
-        }
-    </script>
-
-    @if(session('success'))
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#1A73E8'
-            });
-        </script>
-    @endif
-    @endpush
+@if(session('success'))
+Swal.fire({
+    icon:'success',
+    title:'Berhasil',
+    text:'{{ session('success') }}',
+    confirmButtonColor:'#0F3974'
+})
+@endif
+</script>
+@endpush
 
 </x-mobile-app>

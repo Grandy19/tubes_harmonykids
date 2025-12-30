@@ -66,7 +66,7 @@
         /* Content Scroll Area */
         .content-scroll {
             /* Hapus padding-bottom 120px, layout otomatis handle itu */
-            padding: 280px 24px 120px 24px; 
+            padding: 280px 24px 1px 24px; 
             min-height: 100%; /* Pastikan mengisi layar */
         }
 
@@ -123,16 +123,21 @@
         <div class="header-bg"></div>
         <img src="{{ asset('assets/images/cloud.png') }}" class="cloud-img" alt="cloud">
 
-        <div class="profile-row">
-            <div class="d-flex align-items-center">
-                <a href="" class="avatar-circle"></a>
-                <div class="user-info">
-                    <span class="greeting">Hallo, Selamat Datang!</span>
-                    <span class="username" id="usernameText">Tamu</span>
-                </div>
+    <div class="profile-row">
+        {{-- 1. UBAH 'div' MENJADI 'a' DAN TAMBAHKAN HREF --}}
+        <a href="{{ route('wali.profile.edit') }}" class="d-flex align-items-center" style="text-decoration: none;">
+            
+            {{-- 2. UBAH 'a' MENJADI 'div' (Agar tidak ada link di dalam link) --}}
+            <div class="avatar-circle"></div>
+            
+            <div class="user-info">
+                <span class="greeting">Hallo, Selamat Datang!</span>
+                <span class="username" id="usernameText">Tamu</span>
             </div>
-            <img src="{{ asset('assets/images/logo.png') }}" class="logo-img" alt="Logo">
-        </div>
+        </a>
+
+        <img src="{{ asset('assets/images/logo.png') }}" class="logo-img" alt="Logo">
+    </div>
 
         <div class="location-bar-wrapper" id="locationWrapper">
             <div class="location-bar" onclick="toggleDropdown()">
