@@ -56,7 +56,7 @@ class InstansiController extends Controller
             ])
             ->findOrFail($id);
 
-        return view('wali.detail', compact('instansi'));
+        return view('wali.detail.index', compact('instansi'));
     }
 
     // =======================

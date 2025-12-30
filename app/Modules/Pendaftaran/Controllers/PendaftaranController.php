@@ -24,7 +24,7 @@ class PendaftaranController extends Controller
         $instansi = Instansi::findOrFail($instansi_id);
         
         // Tampilkan view form pendaftaran dengan membawa data instansi
-        return view('wali.daftar', compact('instansi'));
+        return view('wali.daftar.index', compact('instansi'));
     }
 
     /**

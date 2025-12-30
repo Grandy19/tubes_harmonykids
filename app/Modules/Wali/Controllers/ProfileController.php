@@ -31,10 +31,10 @@ class ProfileController extends Controller
 
     public function edit()
     {
-        // Panggil helper di atas
-        $user = $this->getTargetUser();
+        $user = $this->getTargetUser(); // Atau logic user Anda
         
-        return view('wali.edit', compact('user'));
+        // Arahkan ke file index di dalam folder edit
+        return view('wali.edit.index', compact('user')); 
     }
 
     public function update(Request $request)

@@ -12,7 +12,8 @@ use App\Modules\Pendaftaran\Controllers\PendaftaranController;
 | PUBLIC PAGES (Bisa diakses siapa saja)
 |-------------------------------------------------------------------------- 
 */
-Route::get('/', fn () => view('wali.welcome'))->name('wali.welcome');
+// Mengarah ke folder welcome/index.blade.php
+Route::get('/', fn () => view('wali.welcome.index'))->name('wali.welcome');
 
 /*
 |-------------------------------------------------------------------------- 
@@ -20,12 +21,12 @@ Route::get('/', fn () => view('wali.welcome'))->name('wali.welcome');
 |-------------------------------------------------------------------------- 
 */
 Route::middleware(['guest'])->group(function () {
-    // Login
-    Route::get('/wali/login', fn () => view('wali.login'))->name('wali.login');
+    // Login (DIPERBAIKI: Mengarah ke folder login/index.blade.php)
+    Route::get('/wali/login', fn () => view('wali.login.index'))->name('wali.login');
     Route::post('/wali/login', [AuthController::class, 'login'])->name('login.process');
 
-    // Register Wali
-    Route::get('/wali/register', fn () => view('wali.register'))->name('wali.register');
+    // Register Wali (Mengarah ke folder register/index.blade.php)
+    Route::get('/wali/register', fn () => view('wali.register.index'))->name('wali.register');
     Route::post('/wali/register', [AuthController::class, 'register'])->name('register.process');
 });
 
@@ -37,9 +38,9 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     
     // --- DASHBOARD & FITUR UTAMA ---
-    Route::get('/wali/home', fn () => view('wali.home'))->name('wali.home');
-    Route::get('/wali/harmofind', fn () => view('wali.harmofind'))->name('wali.harmofind');
-    Route::get('/wali/harmoview', fn () => view('wali.harmoview'))->name('wali.harmoview');
+    Route::get('/wali/home', fn () => view('wali.home.index'))->name('wali.home');
+    Route::get('/wali/harmofind', fn () => view('wali.harmofind.index'))->name('wali.harmofind');
+    Route::get('/wali/harmoview', fn () => view('wali.harmoview.index'))->name('wali.harmoview');
     
     // Detail Instansi
     Route::get('/instansi/{id}', [InstansiController::class, 'show'])->name('wali.instansi.detail');
@@ -55,11 +56,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('pendaftaran.store');
 
     // --- PROFILE WALI ---
-    Route::get('/wali/profile/edit', [ProfileController::class, 'edit'])
-        ->name('wali.profile.edit'); 
-    
-    Route::put('/wali/profile/update', [ProfileController::class, 'update'])
-        ->name('wali.profile.update');
+    // Edit Profile -> Mengarah ke Controller, Controller harus return view('wali.edit.index')
+    Route::get('/wali/profile/edit', [ProfileController::class, 'edit'])->name('wali.profile.edit'); 
+    Route::put('/wali/profile/update', [ProfileController::class, 'update'])->name('wali.profile.update');
 
     // --- LOGOUT ---
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
