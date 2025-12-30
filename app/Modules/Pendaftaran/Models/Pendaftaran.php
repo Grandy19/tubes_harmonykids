@@ -18,6 +18,9 @@ class Pendaftaran extends Model
         'riwayat_kesehatan',
         'kewarganegaraan',
         'bukti_pembayaran',
+        'nama_bank',
+        'no_rekening',
+        'atas_nama_rekening',
         'status',
     ];
 

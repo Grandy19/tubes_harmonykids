@@ -4,13 +4,10 @@
     {{-- CSS KHUSUS HALAMAN HOME --}}
     @push('styles')
     <style>
-        /* SAYA HAPUS OVERRIDE .mobile-card YANG MERUSAK SCROLL */
-
         /* Header Fixed (Secara visual di atas, tapi ikut scroll) */
         .header-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 300px; z-index: 10;
-            /* Pointer events none biar kalau ada bagian transparan bisa diklik bawahnya (opsional) */
         }
 
         .header-bg {
@@ -32,14 +29,14 @@
 
         .avatar-circle {
             width: 45px; height: 45px; border-radius: 50%; border: 2px solid white;
-            background-image: url("{{ asset('assets/images/avatar.png') }}");
+            /* GAMBAR DIHAPUS DARI SINI, PINDAH KE HTML BIAR DINAMIS */
             background-size: cover; background-color: #ddd; display: block;
         }
 
         .user-info { margin-left: 12px; color: white; display: flex; flex-direction: column; }
         .greeting { font-size: 14px; opacity: 0.9; line-height: 1; }
         .username { font-size: 20px; font-weight: 800; line-height: 1.2; }
-        .logo-img { height: 50px; }
+        .logo-img { height: 60px; }
 
         /* Search Bar & Dropdown */
         .location-bar-wrapper {
@@ -65,9 +62,8 @@
 
         /* Content Scroll Area */
         .content-scroll {
-            /* Hapus padding-bottom 120px, layout otomatis handle itu */
             padding: 280px 24px 1px 24px; 
-            min-height: 100%; /* Pastikan mengisi layar */
+            min-height: 100%; 
         }
 
         /* Promo Banner */
@@ -123,21 +119,31 @@
         <div class="header-bg"></div>
         <img src="{{ asset('assets/images/cloud.png') }}" class="cloud-img" alt="cloud">
 
-    <div class="profile-row">
-        {{-- 1. UBAH 'div' MENJADI 'a' DAN TAMBAHKAN HREF --}}
-        <a href="{{ route('wali.profile.edit') }}" class="d-flex align-items-center" style="text-decoration: none;">
-            
-            {{-- 2. UBAH 'a' MENJADI 'div' (Agar tidak ada link di dalam link) --}}
-            <div class="avatar-circle"></div>
-            
-            <div class="user-info">
-                <span class="greeting">Hallo, Selamat Datang!</span>
-                <span class="username" id="usernameText">Tamu</span>
-            </div>
-        </a>
+        {{-- BAGIAN PROFILE (SUDAH DIPERBAIKI) --}}
+        <div class="profile-row">
+            {{-- Klik area ini akan mengarah ke edit profile --}}
+            <a href="{{ route('wali.profile.edit') }}" class="d-flex align-items-center" style="text-decoration: none;">
+                
+                @php
+                    $user = Auth::user();
+                    // Cek database: kalau ada foto upload pakai itu, kalau tidak pakai default
+                    $foto = ($user && $user->foto_profil) 
+                        ? asset('storage/' . $user->foto_profil) 
+                        : asset('assets/images/avatar.png');
+                @endphp
 
-        <img src="{{ asset('assets/images/logo.png') }}" class="logo-img" alt="Logo">
-    </div>
+                {{-- Gambar dipasang lewat inline style agar dinamis sesuai user --}}
+                <div class="avatar-circle" style="background-image: url('{{ $foto }}');"></div>
+                
+                <div class="user-info">
+                    <span class="greeting">Hallo, Selamat Datang!</span>
+                    {{-- Nama diambil langsung dari database --}}
+                    <span class="username">{{ $user->name ?? 'Tamu' }}</span>
+                </div>
+            </a>
+
+            <img src="{{ asset('assets/images/logo.png') }}" class="logo-img" alt="Logo">
+        </div>
 
         <div class="location-bar-wrapper" id="locationWrapper">
             <div class="location-bar" onclick="toggleDropdown()">
@@ -154,7 +160,6 @@
     </div>
 
     {{-- KONTEN SCROLL --}}
-    {{-- Padding top 280px memberi ruang untuk header --}}
     <div class="content-scroll">
         {{-- PROMO --}}
         <div class="promo-banner">
@@ -193,7 +198,7 @@
             </a>
         </div>
 
-{{-- REKOMENDASI --}}
+        {{-- REKOMENDASI --}}
         <div id="rekomendasiSection" style="display:none;">
             <div style="font-size:18px; font-weight:800; color:#0F3974; margin-bottom:15px;">
                 Rekomendasi Terbaik
@@ -208,19 +213,10 @@
         <div style="height: 120px;"></div>
     </div>
 
-    {{-- NAVBAR HAPUS YANG MANUAL --}}
-    {{-- Layout sudah handle via :withNavbar="true" --}}
-
     {{-- JAVASCRIPT --}}
     @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const name = localStorage.getItem('user_name')
-            if (name) {
-                const el = document.getElementById('usernameText')
-                if (el) el.innerText = name
-            }
-        })
+        // JS lama untuk ambil nama dari localStorage SUDAH DIHAPUS karena diganti Blade.
 
         function toggleDropdown() {
             const wrapper = document.getElementById('locationWrapper');
@@ -259,8 +255,6 @@
                 }
 
                 data.forEach(item => {
-                    // Pastikan path image benar sesuai storage link Laravel
-                    // Jika image null, pakai placeholder
                     const imgPath = item.image ? `/storage/${item.image}` : 'https://via.placeholder.com/100';
                     
                     list.innerHTML += `

@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-    public const HOME = '/home';
+    /**
+     * Path ke "home" untuk user yang sudah login.
+     * Ini digunakan oleh RedirectIfAuthenticated middleware.
+     * * SEBELUMNYA: '/home' (Salah, route ini gak ada)
+     * SEKARANG: '/wali/home' (Benar, route dashboard wali)
+     */
+    public const HOME = '/wali/home';
 
     public function boot(): void
     {
@@ -27,6 +33,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
+            // Load Route API Modules
             Route::middleware('api')
                 ->prefix('api')
                 ->group(app_path('Modules/Auth/Routes/api.php'));
