@@ -6,6 +6,10 @@ use App\Modules\Wali\Controllers\ProfileController;
 use App\Modules\Auth\Controllers\AuthController;
 // 1. IMPORT CONTROLLER PENDAFTARAN (Wajib ada)
 use App\Modules\Pendaftaran\Controllers\PendaftaranController;
+use App\Modules\HarmoTalent\Controllers\HarmoTalentController;
+use App\Modules\Wali\Controllers\SettingsController;
+use App\Modules\Forum\Controllers\ForumController;
+use App\Modules\Instansi\Controllers\LikedController;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -41,6 +45,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wali/home', fn () => view('wali.home.index'))->name('wali.home');
     Route::get('/wali/harmofind', fn () => view('wali.harmofind.index'))->name('wali.harmofind');
     Route::get('/wali/harmoview', fn () => view('wali.harmoview.index'))->name('wali.harmoview');
+    Route::get('/wali/harmotalent', fn () => view('wali.harmotalent.index'))->name('wali.harmotalent');
+    Route::get('/wali/harmotalent', [HarmoTalentController::class, 'index'])->name('wali.harmotalent');
+    Route::get('/wali/harmotalent/result', [HarmoTalentController::class, 'result'])->name('harmotalent.result');
+    // Halaman Utama (Index & Mine digabung via ?tab=)
+    Route::get('/wali/harmotalk', [ForumController::class, 'index'])->name('wali.harmotalk');
+
+    // Halaman Create Form
+    Route::get('/wali/harmotalk/create', [ForumController::class, 'create'])->name('wali.harmotalk.create');
+    Route::post('/wali/harmotalk', [ForumController::class, 'store'])->name('wali.harmotalk.store');
+
+    // Action Like & Comment (AJAX)
+    Route::post('/wali/harmotalk/{id}/like', [ForumController::class, 'like'])->name('wali.harmotalk.like');
+    Route::get('/wali/harmotalk/{id}/comments', [ForumController::class, 'getComments']);
+    Route::post('/wali/harmotalk/{id}/comment', [ForumController::class, 'storeComment'])->name('wali.harmotalk.comment');
     
     // Detail Instansi
     Route::get('/instansi/{id}', [InstansiController::class, 'show'])->name('wali.instansi.detail');
@@ -59,6 +77,17 @@ Route::middleware(['auth'])->group(function () {
     // Edit Profile -> Mengarah ke Controller, Controller harus return view('wali.edit.index')
     Route::get('/wali/profile/edit', [ProfileController::class, 'edit'])->name('wali.profile.edit'); 
     Route::put('/wali/profile/update', [ProfileController::class, 'update'])->name('wali.profile.update');
+
+    Route::get('/wali/settings', [SettingsController::class, 'index'])->name('wali.settings');
+    Route::put('/wali/settings/password', [SettingsController::class, 'updatePassword'])->name('wali.settings.password');
+
+    Route::get('/disukai', [LikedController::class, 'index'])->name('wali.liked');
+
+    // 2. Route Notifikasi (Placeholder agar tidak error)
+    // Kita arahkan ke '#' atau buat view kosong sementara
+    Route::get('/notifikasi', function() {
+        return "Halaman Notifikasi (Segera Hadir)";
+    })->name('wali.notifications');
 
     // --- LOGOUT ---
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

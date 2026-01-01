@@ -1,16 +1,25 @@
-<div x-data="bottomNav()" x-init="init()" class="absolute bottom-0 left-0 w-full z-50 h-[100px] overflow-visible">
+<div x-data="bottomNav()"
+     x-init="init()"
+     class="absolute bottom-0 left-0 w-full z-[999] h-[100px] overflow-visible pointer-events-none"
+     style="display: none;" 
+     x-show="true">
 
-    <svg class="absolute bottom-0 left-0 w-full h-full drop-shadow-[0_-5px_10px_rgba(0,0,0,0.1)] pointer-events-none" preserveAspectRatio="none">
+    {{-- 1. SVG OMBAK (Background) --}}
+    <svg class="absolute bottom-0 left-0 w-full h-full drop-shadow-[0_-5px_10px_rgba(0,0,0,0.1)]" preserveAspectRatio="none">
         <defs>
             <linearGradient id="mainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" style="stop-color:#3577E5;stop-opacity:1" />
                 <stop offset="100%" style="stop-color:#0F3974;stop-opacity:1" />
             </linearGradient>
         </defs>
-        <path :d="pathString" fill="url(#mainGradient)" class="transition-all duration-300 ease-out"></path>
+        {{-- Fallback path jika JS belum load --}}
+        <path :d="pathString || 'M 0,30 L 1000,30 L 1000,100 L 0,100 Z'" 
+              fill="url(#mainGradient)" 
+              class="transition-all duration-300 ease-out"></path>
     </svg>
 
-    <div class="absolute top-0 transition-all duration-300 ease-out z-20"
+    {{-- 2. LINGKARAN AKTIF (Floating Circle) --}}
+    <div class="absolute top-0 transition-all duration-300 ease-out z-20 pointer-events-auto"
          :style="`left: ${activeX - 30}px`">
         <div class="w-[60px] h-[60px] rounded-full bg-[#3577E5] flex items-center justify-center border-2 border-white/20"
              style="box-shadow: 0 4px 25px rgba(110, 193, 228, 0.6);">
@@ -22,18 +31,20 @@
         </div>
     </div>
 
-    <div class="absolute bottom-0 left-0 w-full h-[80px] flex justify-around items-center z-30">
+    {{-- 3. IKON TOMBOL (Clickable Area) --}}
+    <div class="absolute bottom-0 left-0 w-full h-[80px] flex justify-around items-center z-30 pointer-events-auto">
         <template x-for="(item, index) in items" :key="index">
             <button @click="select(index)" class="w-[60px] h-[60px] flex flex-col justify-center items-center focus:outline-none">
                 <div class="pt-[15px] transition-opacity duration-200"
                      :class="selectedIndex === index ? 'opacity-0' : 'opacity-100'">
-                     <i :class="[item.icon, 'text-white/80 text-2xl']"></i>
+                    <i :class="[item.icon, 'text-white/80 text-2xl']"></i>
                 </div>
             </button>
         </template>
     </div>
 </div>
 
+@push('scripts')
 <script>
     function bottomNav() {
         return {
@@ -42,17 +53,49 @@
             width: 0,
             pathString: '',
             
+            // --- KONFIGURASI MENU ---
             items: [
-                { icon: 'fas fa-home' },
-                { icon: 'fas fa-clock' },
-                { icon: 'fas fa-bell' },
-                { icon: 'fas fa-cog' }
+                // Index 0: Home
+                { 
+                    icon: 'fas fa-home', 
+                    url: "{{ route('wali.home') }}" 
+                }, 
+                
+                // Index 1: Like / Disukai (Halaman Instansi yg di-like)
+                { 
+                    icon: 'fas fa-heart', 
+                    // Ganti 'wali.liked' dengan nama route yang sesuai di web.php Anda
+                    url: "{{ route('wali.liked') ?? '#' }}" 
+                }, 
+                
+                // Index 2: Notifikasi
+                { 
+                    icon: 'fas fa-bell', 
+                    // Ganti 'wali.notifications' dengan nama route yang sesuai di web.php Anda
+                    url: "{{ route('wali.notifications') ?? '#' }}" 
+                }, 
+                
+                // Index 3: Setting
+                { 
+                    icon: 'fas fa-cog', 
+                    url: "{{ route('wali.settings') }}" 
+                }   
             ],
 
             init() {
-                // Trik agar Alpine membaca lebar elemen container ($el)
+                // Tentukan tab aktif berdasarkan URL saat ini
+                const currentUrl = window.location.href;
+                this.items.forEach((item, index) => {
+                    if (item.url !== '#' && (currentUrl === item.url || currentUrl.startsWith(item.url))) {
+                        this.selectedIndex = index;
+                    }
+                });
+
+                // Hitung dimensi SVG
                 this.$nextTick(() => {
                     this.updateDimensions();
+                    setTimeout(() => this.updateDimensions(), 100);
+                    setTimeout(() => this.updateDimensions(), 500);
                 });
 
                 window.addEventListener('resize', () => {
@@ -63,12 +106,20 @@
             select(index) {
                 this.selectedIndex = index;
                 this.calculateMetrics();
+
+                // Logika Pindah Halaman dengan Delay Animasi
+                const url = this.items[index].url;
+                if (url && url !== '#') {
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 300);
+                }
             },
 
             updateDimensions() {
-                // Mengambil lebar elemen container navbar, bukan window
                 if (this.$el) {
                     this.width = this.$el.offsetWidth; 
+                    if(this.width === 0) this.width = window.innerWidth > 420 ? 420 : window.innerWidth;
                     this.calculateMetrics();
                 }
             },
@@ -85,6 +136,7 @@
                 const height = 100;
                 const curveRadius = 38; 
 
+                // Menggambar kurva SVG
                 let p = `M 0,${topY} `;
                 p += `L ${this.activeX - curveRadius - 15},${topY} `; 
                 p += `C ${this.activeX - curveRadius},${topY} ${this.activeX - curveRadius},${topY + 40} ${this.activeX},${topY + 40} `;
@@ -97,3 +149,4 @@
         }
     }
 </script>
+@endpush

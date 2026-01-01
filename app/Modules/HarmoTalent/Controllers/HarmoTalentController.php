@@ -4,25 +4,37 @@ namespace App\Modules\HarmoTalent\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Modules\Instansi\Models\Instansi;
 
 class HarmoTalentController extends Controller
 {
-    public function index(Request $request)
+    // =======================
+    // HALAMAN PILIH BAKAT
+    // =======================
+    public function index()
     {
-        $request->validate([
-            'bakat' => 'required',
-        ]);
+        return view('wali.harmotalent.index');
+    }
 
-        return Instansi::where('status', 'approved')
-            ->where('bakat', $request->bakat)
-            ->select(
-                'id',
-                'nama',
-                'bakat',
-                'lokasi',
-                'biaya_pendaftaran'
-            )
-            ->get();
+    // =======================
+    // HALAMAN HASIL (HARMO TALENT)
+    // =======================
+    public function result(Request $request)
+    {
+        // Ambil parameter dari URL
+        $bakat = $request->query('bakat');
+        $kategori = $request->query('kategori'); // boleh null
+        $sort = $request->query('sort');         // boleh null
+
+        /**
+         * CATATAN PENTING:
+         * - Controller ini TIDAK melakukan query database
+         * - Semua data akan diambil via AJAX (API Instansi)
+         * - Ini agar HarmoTalent konsisten dengan HarmoFind
+         */
+
+        return view(
+            'wali.harmotalent.result.index',
+            compact('bakat', 'kategori', 'sort')
+        );
     }
 }

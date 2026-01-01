@@ -94,7 +94,7 @@
     /* 7. ICON BINTANG KANAN */
     .icon-star {
         color: #FFC107; /* AppColors.accentYellow */
-        font-size: 36px;
+        font-size: 27px;
         margin-right: 8px;
     }
 

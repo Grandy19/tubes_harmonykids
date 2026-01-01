@@ -47,7 +47,7 @@
     .dot-indicator { 
         width: 14px; height: 14px; border-radius: 50%; margin-left: 10px; flex-shrink: 0; z-index: 5;
     }
-    .dot-blue { background: #2E7CF6; }
+    .dot-blue { background: #3577E5; }
     .dot-red { background: #EA4335; }
 
     /* Choices JS Styling */

@@ -1,47 +1,52 @@
 @push('scripts')
 <script>
+    // State Awal
     let currentState = {
-        location: 'Bandung',
-        category: 'TK/PG',
-        sort: 'Terbaru'
+        location: '{{ $lokasi ?? "Bandung" }}',
+        category: '{{ $kategori ?? "TK/PG" }}',
+        sort: '{{ $sort ?? "Terbaru" }}',
+        bakat: '{{ $bakat ?? "" }}'
     };
 
     document.addEventListener('DOMContentLoaded', fetchData);
 
     async function fetchData() {
         const container = document.getElementById('schoolListContainer');
-        
+
         container.innerHTML = `
             <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="text-gray-400 text-sm mt-2">Sedang memuat data...</p>
+                <div class="spinner-border text-primary"></div>
+                <p class="text-muted mt-2 small">Sedang memuat data...</p>
             </div>
         `;
 
         try {
             const params = new URLSearchParams();
-            params.append('lokasi', currentState.location); 
+            if (currentState.bakat) params.append('bakat', currentState.bakat);
             params.append('jenis', currentState.category);
-
-            console.log("Fetching: /api/instansi?" + params.toString());
+            params.append('lokasi', currentState.location);
 
             const res = await fetch(`/api/instansi?${params.toString()}`);
+            if (!res.ok) throw new Error(res.status);
+
             let data = await res.json();
 
+            // Sorting
             if (currentState.sort === 'Harga Tertinggi') {
                 data.sort((a, b) => b.biaya_pendaftaran - a.biaya_pendaftaran);
             } else if (currentState.sort === 'Harga Terendah') {
                 data.sort((a, b) => a.biaya_pendaftaran - b.biaya_pendaftaran);
+            } else {
+                data.sort((a, b) => b.id - a.id);
             }
 
             renderList(data);
 
         } catch (error) {
-            console.error("Error:", error);
             container.innerHTML = `
                 <div class="text-center py-5">
-                    <p class="text-red-400 font-bold">Gagal memuat data</p>
-                    <button onclick="fetchData()" class="mt-2 text-blue-600 font-bold">Coba Lagi</button>
+                    <p class="text-danger fw-bold">Gagal memuat data</p>
+                    <button onclick="fetchData()" class="btn btn-link">Coba Lagi</button>
                 </div>
             `;
         }
@@ -49,56 +54,68 @@
 
     function renderList(data) {
         const container = document.getElementById('schoolListContainer');
-        
+
         if (!data || data.length === 0) {
             container.innerHTML = `
-                <div class="text-center py-10">
-                    <i class="fa-solid fa-school-circle-xmark text-gray-300 text-6xl mb-4"></i>
-                    <p class="text-gray-400">Tidak ada sekolah di <br><b>${currentState.location}</b> untuk <b>${currentState.category}</b></p>
+                <div class="empty-state text-center py-10">
+                    <img src="https://via.placeholder.com/150/e2e8f0/94a3b8?text=Tidak+Ditemukan"
+                         class="empty-img">
+                    <p class="text-muted fw-semibold mt-3">
+                        Tidak ada sekolah di <b>${currentState.location}</b><br>
+                        kategori <b>${currentState.category}</b>
+                    </p>
                 </div>
             `;
             return;
         }
 
         container.innerHTML = data.map(item => {
-            let imgPath = item.image ? `/storage/${item.image}` : 'https://via.placeholder.com/150';
-            let price = new Intl.NumberFormat('id-ID').format(item.biaya_pendaftaran);
+            const imgPath = item.image
+                ? `/storage/${item.image.replace('public/', '')}`
+                : 'https://via.placeholder.com/200x200/E2E8F0/94A3B8?text=No+Image';
+
+            const price = new Intl.NumberFormat('id-ID').format(item.biaya_pendaftaran || 0);
+
+            let badgeText = '';
+            if (currentState.sort === 'Harga Tertinggi') badgeText = 'Fasilitas Premium';
+            else if (currentState.sort === 'Harga Terendah') badgeText = 'Harga Hemat';
+            else badgeText = 'Baru Ditambahkan';
 
             return `
-                <div class="school-card" onclick="window.location.href='/instansi/${item.id}'">
-                    <img src="${imgPath}" class="sc-img">
+                <a href="/instansi/${item.id}" class="school-card">
+                    <img src="${imgPath}" class="sc-img"
+                         onerror="this.src='https://via.placeholder.com/200x200/E2E8F0/94A3B8?text=No+Image'">
+
                     <div class="sc-rating">
-                        <i class="fa-solid fa-star"></i> ${item.rating ?? '5.0'}
+                        <i class="fa-solid fa-star"></i> ${item.rating || '5.0'}
                     </div>
+
                     <div class="sc-content">
                         <div>
                             <div class="sc-title">${item.nama}</div>
-                            <div class="sc-price">Rp ${price} /Bulan</div>
+                            <div class="sc-price">Rp ${price}</div>
+
                             <div class="sc-badge">
-                                <i class="fa-solid fa-circle-check"></i> Terpopuler
+                                <span class="badge-pill">
+                                    <i class="fa-solid fa-circle-check"></i> ${badgeText}
+                                </span>
                             </div>
                         </div>
+
                         <div class="sc-location">
-                            <i class="fa-solid fa-location-dot"></i> ${item.lokasi}
+                            <i class="fa-solid fa-location-dot"></i>
+                            ${item.lokasi || currentState.location}
                         </div>
                     </div>
-                </div>
+                </a>
             `;
         }).join('');
     }
 
-    /* --- EVENT HANDLERS --- */
+    /* EVENT HANDLERS */
     function toggleLocation() {
-        const box = document.getElementById('locationDropdown');
-        const arrow = document.getElementById('locArrow');
-        box.classList.toggle('active');
-        
-        if(box.classList.contains('active')) {
-            arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
-            document.getElementById('sortDropdown').classList.remove('active');
-        } else {
-            arrow.classList.replace('fa-chevron-up', 'fa-chevron-down');
-        }
+        document.getElementById('locationDropdown').classList.toggle('active');
+        document.getElementById('sortDropdown').classList.remove('active');
     }
 
     function selectLocation(val) {
@@ -108,10 +125,10 @@
         fetchData();
     }
 
-    function selectCategory(val) {
+    function selectCategory(val, el) {
         currentState.category = val;
-        document.getElementById('btnTK').classList.toggle('active', val === 'TK/PG');
-        document.getElementById('btnDaycare').classList.toggle('active', val === 'Daycare');
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+        el.classList.add('active');
         fetchData();
     }
 
@@ -120,11 +137,16 @@
         document.getElementById('locationDropdown').classList.remove('active');
     }
 
-    function selectSort(val) {
-        currentState.sort = val;
-        document.getElementById('sortLabel').innerText = val.replace('Harga ', '');
+    function selectSort(value, label = value) {
+        currentState.sort = value;
+        document.getElementById('sortLabel').innerText = label;
         toggleSort();
         fetchData();
     }
+
+    document.addEventListener('click', e => {
+        if (!locationDropdown.contains(e.target)) locationDropdown.classList.remove('active');
+        if (!sortDropdown.contains(e.target)) sortDropdown.classList.remove('active');
+    });
 </script>
 @endpush
