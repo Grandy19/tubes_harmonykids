@@ -15,7 +15,8 @@ return new class extends Migration {
                 ->onDelete('cascade');
 
             $table->string('image_path');
-            $table->enum('category', ['galeri', 'ruangan', 'sdm', 'layanan']);
+            $table->enum('category', ['utama', 'profil', 'fasilitas', 'sdm']);
+
 
             $table->timestamps();
         });

@@ -11,5 +11,10 @@
             display.style.fontWeight = 'normal';
         }
     }
+
+    function closePopup(){
+        const popup = document.getElementById('successPopup');
+        if(popup) popup.remove();
+    }
 </script>
 @endpush

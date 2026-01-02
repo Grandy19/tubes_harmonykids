@@ -8,7 +8,7 @@ class InstansiProfile extends Model
 {
     protected $fillable = [
         'instansi_id',
-        'deskripsi',
+        'sekilas_tentang_kami',
         'program_pembelajaran',
     ];
 

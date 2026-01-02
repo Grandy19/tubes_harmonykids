@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
@@ -10,7 +8,12 @@ return new class extends Migration {
     {
         DB::statement("
             ALTER TABLE pendaftarans
-            MODIFY status ENUM('pending','approved','rejected')
+            MODIFY status ENUM(
+                'pending',
+                'verified',
+                'accepted',
+                'rejected'
+            )
             NOT NULL DEFAULT 'pending'
         ");
     }
@@ -19,7 +22,10 @@ return new class extends Migration {
     {
         DB::statement("
             ALTER TABLE pendaftarans
-            MODIFY status ENUM('pending')
+            MODIFY status ENUM(
+                'pending',
+                'rejected'
+            )
             NOT NULL DEFAULT 'pending'
         ");
     }

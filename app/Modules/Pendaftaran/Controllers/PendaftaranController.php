@@ -67,49 +67,9 @@ class PendaftaranController extends Controller
         ]);
 
         // D. Redirect kembali ke Home dengan pesan sukses
-        return redirect()->route('wali.home')->with('success', 'Pendaftaran berhasil dikirim! Mohon tunggu konfirmasi admin.');
-    }
-
-    // =========================================================================
-    // BAGIAN PENGELOLA (ADMIN INSTANSI)
-    // =========================================================================
-
-    // LIST PENDAFTARAN MASUK
-    public function index(Request $request)
-    {
-        return response()->json([
-            'login_user_id' => $request->user()->id,
-            'pendaftaran' => Pendaftaran::whereHas('instansi', function ($q) use ($request) {
-                $q->where('pengelola_id', $request->user()->id);
-            })->get()
-        ]);
-    }
-
-    // TERIMA PENDAFTARAN (APPROVE)
-    public function approve($id, Request $request)
-    {
-        $pendaftaran = Pendaftaran::where('id', $id)
-            ->whereHas('instansi', function ($q) use ($request) {
-                $q->where('pengelola_id', $request->user()->id);
-            })
-            ->firstOrFail();
-
-        $pendaftaran->update(['status' => 'approved']);
-
-        return response()->json(['message' => 'Pendaftaran diterima']);
-    }
-
-    // TOLAK PENDAFTARAN (REJECT)
-    public function reject($id, Request $request)
-    {
-        $pendaftaran = Pendaftaran::where('id', $id)
-            ->whereHas('instansi', function ($q) use ($request) {
-                $q->where('pengelola_id', $request->user()->id);
-            })
-            ->firstOrFail();
-
-        $pendaftaran->update(['status' => 'rejected']);
-
-        return response()->json(['message' => 'Pendaftaran ditolak']);
+        return redirect()->back()->with(
+            'success',
+            'Pendaftaran berhasil dikirim! Mohon tunggu konfirmasi admin.'
+        );
     }
 }

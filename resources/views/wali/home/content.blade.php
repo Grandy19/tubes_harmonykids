@@ -46,7 +46,7 @@
     <div class="promo-banner">
         <div class="banner-text-area">
             <div class="banner-quote">“Cari Sekolah Anak Lebih Mudah”</div>
-            <a href="#" class="btn-banner">Klik Disini</a>
+            <a href="{{ route('wali.harmofind') }}" class="btn-banner">Klik Disini</a>
         </div>
         <img src="{{ asset('assets/images/anak_playground.png') }}" class="banner-img-child" alt="Child">
     </div>

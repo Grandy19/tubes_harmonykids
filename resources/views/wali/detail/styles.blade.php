@@ -129,11 +129,6 @@
     .fas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .fas-item { position: relative; height: 100px; border-radius: 14px; overflow: hidden; }
     .fas-item img { width: 100%; height: 100%; object-fit: cover; }
-    .fas-overlay {
-        position: absolute; bottom: 0; width: 100%;
-        background: rgba(0,0,0,0.6); color: white;
-        font-size: 10px; font-weight: 700; padding: 6px; text-align: center;
-    }
 
     /* --- UPDATE STYLE KARTU BIAYA & JAM --- */
     .stat-row { 

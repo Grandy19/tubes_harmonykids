@@ -1,11 +1,11 @@
-<x-mobile-app title="Buat Postingan" :withNavbar="false">
+<x-mobile-app title="Buat Postingan" :withNavbar="true">
 
     @push('styles')
     <style>
         .page-container { position: relative; width: 100%; height: 100vh; background: #F8FAFC; overflow: hidden; }
         .header-layer { position: absolute; top: 0; left: 0; right: 0; height: 140px; z-index: 50; pointer-events: none; }
         .header-layer > * { pointer-events: auto; }
-        .content-scroll { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding-top: 140px; padding-bottom: 40px; overflow-y: auto; z-index: 10; -ms-overflow-style: none; scrollbar-width: none; }
+        .content-scroll { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding-top: 240px; padding-bottom: 10px; overflow-y: auto; z-index: 10; -ms-overflow-style: none; scrollbar-width: none; }
         .content-scroll::-webkit-scrollbar { display: none; }
         
         .form-area { padding: 10px 24px 40px 24px; }

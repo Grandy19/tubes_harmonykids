@@ -44,4 +44,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function instansi()
+    {
+        return $this->hasOne(
+            \App\Modules\Instansi\Models\Instansi::class,
+            'pengelola_id'
+        );
+    }
+
+    public function likedInstansis()
+    {
+        return $this->belongsToMany(
+            \App\Modules\Instansi\Models\Instansi::class,
+            'instansi_likes',
+            'user_id',
+            'instansi_id'
+        );
+    }
+
 }

@@ -17,38 +17,29 @@ class InstansiController extends Controller
     public function index(Request $request)
     {
         $query = Instansi::where('status', 'approved')
-            ->with(['profile', 'galleries']);
+            ->with(['profile', 'galleries', 'galleryUtama']);
 
-        // 1. FILTER LOKASI
         if ($request->filled('lokasi') && $request->lokasi !== 'Semua') {
             $query->where('lokasi', 'LIKE', '%' . $request->lokasi . '%');
         }
 
-        // 2. FILTER JENIS (PENTING: CEGAH STRING KOSONG)
-        if (
-            $request->filled('jenis') &&
-            $request->jenis !== 'Semua' &&
-            $request->jenis !== ''
-        ) {
+        if ($request->filled('jenis') && $request->jenis !== 'Semua') {
             $query->where('jenis', $request->jenis);
         }
 
-        // 3. FILTER KEYWORD (FITUR LAIN, BIARKAN)
         if ($request->filled('keyword')) {
             $query->where('nama', 'LIKE', '%' . $request->keyword . '%');
         }
 
-        // 4. FILTER BAKAT (HARMO TALENT - FINAL)
         if ($request->filled('bakat')) {
             $query->where('bakat', 'LIKE', '%' . $request->bakat . '%');
         }
 
-        // 5. SORTING
         if ($request->filled('sort')) {
             match ($request->sort) {
-                'Harga Terendah' => $query->orderBy('biaya_pendaftaran', 'asc'),
+                'Harga Terendah'  => $query->orderBy('biaya_pendaftaran', 'asc'),
                 'Harga Tertinggi'=> $query->orderBy('biaya_pendaftaran', 'desc'),
-                default          => $query->orderBy('created_at', 'desc'),
+                default           => $query->orderBy('created_at', 'desc'),
             };
         } else {
             $query->orderBy('created_at', 'desc');
@@ -58,19 +49,26 @@ class InstansiController extends Controller
     }
 
     // =======================
-    // DETAIL INSTANSI
+    // DETAIL INSTANSI (WALI)
     // =======================
     public function show($id)
     {
         $instansi = Instansi::where('status', 'approved')
-            ->with(['profile', 'galleries', 'user'])
+            ->with([
+                'profile',
+                'user',
+                'galleryUtama',
+                'galleryProfil',
+                'galleryFasilitas',
+                'gallerySDM'
+            ])
             ->findOrFail($id);
 
         return view('wali.detail.index', compact('instansi'));
     }
 
     // =======================
-    // CREATE INSTANSI (API)
+    // CREATE INSTANSI
     // =======================
     public function store(Request $request)
     {
@@ -91,83 +89,46 @@ class InstansiController extends Controller
             ], 403);
         }
 
-        try {
-            $result = DB::transaction(function () use ($request, $validated) {
-                $instansi = Instansi::create(array_merge($validated, [
-                    'pengelola_id' => $request->user()->id,
-                    'status'       => 'pending'
-                ]));
+        $instansi = DB::transaction(function () use ($request, $validated) {
 
-                InstansiProfile::create([
-                    'instansi_id' => $instansi->id
-                ]);
+            $instansi = Instansi::create(array_merge($validated, [
+                'pengelola_id' => $request->user()->id,
+                'status'       => 'pending'
+            ]));
 
-                return $instansi;
-            });
+            InstansiProfile::create([
+                'instansi_id' => $instansi->id
+            ]);
 
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Instansi berhasil didaftarkan',
-                'data'    => $result
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Gagal membuat instansi: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // =======================
-    // UPDATE INSTANSI
-    // =======================
-    public function update(Request $request)
-    {
-        $instansi = Instansi::where('pengelola_id', $request->user()->id)->first();
-
-        if (!$instansi) {
-            return response()->json(['message' => 'Instansi tidak ditemukan'], 404);
-        }
-
-        $validated = $request->validate([
-            'nama'              => 'sometimes|required|string|max:255',
-            'jenis'             => 'sometimes|required|in:TK/PG,Daycare',
-            'lokasi'            => 'sometimes|required|string',
-            'biaya_pendaftaran' => 'sometimes|required|integer|min:0',
-            'jam_operasional'   => 'sometimes|required|string',
-            'telepon'           => 'sometimes|required|string|max:20',
-            'email'             => 'sometimes|required|email',
-        ]);
-
-        $instansi->update($validated);
+            return $instansi;
+        });
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil diperbarui'
-        ]);
+            'status'  => 'success',
+            'message' => 'Instansi berhasil didaftarkan',
+            'data'    => $instansi
+        ], 201);
     }
 
     // =======================
-    // UPLOAD GALERI
+    // UPLOAD GALERI (API / ASYNC)
     // =======================
     public function uploadGallery(Request $request)
     {
         $request->validate([
             'image'    => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'category' => 'required|in:galeri,ruangan,sdm,layanan',
+            'category' => 'required|in:utama,profil,fasilitas,sdm',
         ]);
 
-        $instansi = Instansi::where('pengelola_id', $request->user()->id)->firstOrFail();
+        // Pastikan hanya pengelola instansi sendiri
+        $instansi = Instansi::where('pengelola_id', $request->user()->id)
+            ->firstOrFail();
 
-        if ($request->category === 'galeri') {
-            $count = InstansiGallery::where('instansi_id', $instansi->id)
-                ->where('category', 'galeri')
-                ->count();
-
-            if ($count >= 2) {
-                return response()->json(['message' => 'Maksimal 2 foto utama'], 422);
-            }
+        // FOTO UTAMA → SINGLE
+        if ($request->category === 'utama') {
+            InstansiGallery::where('instansi_id', $instansi->id)
+                ->where('category', 'utama')
+                ->delete();
         }
 
         $path = $request->file('image')->store('instansi', 'public');
@@ -178,6 +139,9 @@ class InstansiController extends Controller
             'category'    => $request->category,
         ]);
 
-        return response()->json(['status' => 'success', 'data' => $gallery], 201);
+        return response()->json([
+            'status' => 'success',
+            'data'   => $gallery
+        ], 201);
     }
 }

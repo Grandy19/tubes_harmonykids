@@ -13,6 +13,7 @@ class Instansi extends Model
         'jenis',
         'lokasi',
         'biaya_pendaftaran',
+        'jenis_pembayaran',
         'jam_operasional',
         'telepon',
         'email',
@@ -28,14 +29,43 @@ class Instansi extends Model
         return $this->hasOne(InstansiProfile::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'pengelola_id');
+    }
+
+    /**
+     * 🔥 RELASI UMUM (WAJIB UNTUK API / HARMOFIND)
+     */
     public function galleries()
     {
         return $this->hasMany(InstansiGallery::class);
     }
 
-    // 🔥 RELASI YANG KEMARIN HILANG
-    public function user()
+    /**
+     * RELASI SPESIFIK (DETAIL)
+     */
+    public function galleryUtama()
     {
-        return $this->belongsTo(User::class, 'pengelola_id');
+        return $this->hasOne(InstansiGallery::class)
+            ->where('category', 'utama');
+    }
+
+    public function galleryProfil()
+    {
+        return $this->hasMany(InstansiGallery::class)
+            ->where('category', 'profil');
+    }
+
+    public function galleryFasilitas()
+    {
+        return $this->hasMany(InstansiGallery::class)
+            ->where('category', 'fasilitas');
+    }
+
+    public function gallerySDM()
+    {
+        return $this->hasMany(InstansiGallery::class)
+            ->where('category', 'sdm');
     }
 }

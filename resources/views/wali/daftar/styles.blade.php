@@ -129,5 +129,80 @@
         cursor: pointer; box-shadow: 0 10px 25px rgba(53, 119, 229, 0.25); border:none; transition: 0.2s;
     }
     .btn-submit:active { transform: scale(0.98); }
+
+    /* POPUP OVERLAY (NEMPEL KE FRAME) */
+.frame-popup-overlay{
+    position: absolute;
+    inset: 0;
+    background: rgba(15,23,42,.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+/* CARD */
+.frame-popup-card{
+    width: 85%;
+    max-width: 320px;
+    background: white;
+    border-radius: 22px;
+    padding: 28px 22px;
+    text-align: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,.25);
+    animation: popupScale .25s ease;
+}
+
+/* ICON */
+.popup-icon{
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #DCFCE7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.popup-icon i{
+    font-size: 34px;
+    color: #22C55E;
+}
+
+/* TEXT */
+.frame-popup-card h3{
+    font-size: 20px;
+    font-weight: 800;
+    color: #0F172A;
+    margin-bottom: 6px;
+}
+.frame-popup-card p{
+    font-size: 14px;
+    color: #64748B;
+    margin-bottom: 22px;
+}
+
+/* BUTTON */
+.frame-popup-card button{
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: #3577E5;
+    color: white;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+}
+.frame-popup-card button:active{
+    transform: scale(.97);
+}
+
+/* ANIMASI */
+@keyframes popupScale{
+    from{transform: scale(.85);opacity:0}
+    to{transform: scale(1);opacity:1}
+}
+
 </style>
 @endpush

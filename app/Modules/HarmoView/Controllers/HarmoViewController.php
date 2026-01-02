@@ -23,7 +23,7 @@ class HarmoViewController extends Controller
 
         $instansis = Instansi::whereIn('id',$ids)
             ->where('status','approved')
-            ->with(['profile','galleries'])
+            ->with(['profile','galleryUtama'])
             ->get();
 
         if($instansis->count() !== 2){
@@ -48,12 +48,18 @@ class HarmoViewController extends Controller
                 : 0;
 
             return [
-                'id'=>$i->id,
-                'nama'=>$i->nama,
-                'biaya'=>$i->biaya_pendaftaran,
-                'jumlah_fasilitas'=>$jumlahFasilitas,
-                'jam_operasional'=>$durasiJam,
-                'jumlah_program'=>$jumlahProgram,
+                'id' => $i->id,
+                'nama' => $i->nama,
+                'biaya' => $i->biaya_pendaftaran,
+                'lokasi' => $i->lokasi,
+                'gallery_utama' => $i->galleryUtama
+                    ? [
+                        'image_path' => $i->galleryUtama->image_path
+                    ]
+                    : null,
+                'jumlah_fasilitas' => $jumlahFasilitas,
+                'jam_operasional' => $durasiJam,
+                'jumlah_program' => $jumlahProgram,
             ];
         });
     }

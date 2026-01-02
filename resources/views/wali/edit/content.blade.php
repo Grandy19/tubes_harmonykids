@@ -85,3 +85,17 @@
         <button type="submit" class="btn-save">Simpan</button>
     </form>
 </div>
+
+{{-- POPUP SUCCESS --}}
+@if(session('success'))
+<div class="frame-popup-overlay" id="successPopup">
+    <div class="frame-popup-card">
+        <div class="popup-icon">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h3>Berhasil</h3>
+        <p>{{ session('success') }}</p>
+        <button type="button" onclick="closePopup()">OK</button>
+    </div>
+</div>
+@endif

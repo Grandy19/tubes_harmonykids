@@ -70,8 +70,10 @@
         }
 
         container.innerHTML = data.map(item => {
-            const imgPath = item.image
-                ? `/storage/${item.image.replace('public/', '')}`
+            const utama = item.galleries?.find(g => g.category === 'utama');
+
+            const imgPath = utama
+                ? `/storage/${utama.image_path}`
                 : 'https://via.placeholder.com/200x200/E2E8F0/94A3B8?text=No+Image';
 
             const price = new Intl.NumberFormat('id-ID').format(item.biaya_pendaftaran || 0);

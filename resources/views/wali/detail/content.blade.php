@@ -3,12 +3,15 @@
     {{-- LAYER 1: HERO IMAGE --}}
     <div class="hero-layer">
         @php
-            $bg = $instansi->galleries->first() 
-                ? asset('storage/'.$instansi->galleries->first()->image_path) 
+            $bg = $instansi->galleryUtama
+                ? asset('storage/' . $instansi->galleryUtama->image_path)
                 : 'https://via.placeholder.com/400x300';
+
+            $isLiked = auth()->user()
+                ->likedInstansis
+                ->contains($instansi->id);
         @endphp
         <img src="{{ $bg }}" class="hero-img">
-        <div class="hero-overlay"></div>
     </div>
 
     {{-- LAYER 2: HEADER & INFO --}}
@@ -18,9 +21,14 @@
             <a href="{{ route('wali.home') }}" class="nav-btn">
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
-            <button class="nav-btn">
-                <i class="fa-regular fa-heart"></i>
-            </button>
+
+            <form action="{{ route('wali.instansi.like', $instansi->id) }}"
+                  method="POST">
+                @csrf
+                <button type="submit" class="nav-btn">
+                    <i class="fa-{{ $isLiked ? 'solid' : 'regular' }} fa-heart"></i>
+                </button>
+            </form>
         </div>
 
         {{-- Info Teks --}}
@@ -45,7 +53,7 @@
             <button class="tab-btn" onclick="switchTab('detail', this)">Detail</button>
         </div>
 
-        {{-- Panel Content (DIPISAH KE FOLDER TABS) --}}
+        {{-- Panel Content --}}
         @include('wali.detail.tabs.profil')
         @include('wali.detail.tabs.fasilitas')
         @include('wali.detail.tabs.detail')

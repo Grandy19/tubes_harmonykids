@@ -12,7 +12,6 @@
                 <stop offset="100%" style="stop-color:#0F3974;stop-opacity:1" />
             </linearGradient>
         </defs>
-        {{-- Fallback path jika JS belum load --}}
         <path :d="pathString || 'M 0,30 L 1000,30 L 1000,100 L 0,100 Z'" 
               fill="url(#mainGradient)" 
               class="transition-all duration-300 ease-out"></path>
@@ -34,10 +33,32 @@
     {{-- 3. IKON TOMBOL (Clickable Area) --}}
     <div class="absolute bottom-0 left-0 w-full h-[80px] flex justify-around items-center z-30 pointer-events-auto">
         <template x-for="(item, index) in items" :key="index">
-            <button @click="select(index)" class="w-[60px] h-[60px] flex flex-col justify-center items-center focus:outline-none">
-                <div class="pt-[15px] transition-opacity duration-200"
+            <button @click="select(index)"
+                    class="w-[60px] h-[60px] flex flex-col justify-center items-center focus:outline-none">
+
+                <div class="pt-[15px] transition-opacity duration-200 relative"
                      :class="selectedIndex === index ? 'opacity-0' : 'opacity-100'">
+
                     <i :class="[item.icon, 'text-white/80 text-2xl']"></i>
+
+                    {{-- ❤️ BADGE DISUKAI (INDEX 1) --}}
+                    @if(isset($likedCount) && $likedCount > 0)
+                        <span x-show="index === 1"
+                              class="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px]
+                                     rounded-full px-1.5 leading-tight">
+                            {{ $likedCount }}
+                        </span>
+                    @endif
+
+                    {{-- 🔔 BADGE NOTIFIKASI (INDEX 2) --}}
+                    @if(isset($notificationCount) && $notificationCount > 0)
+                        <span x-show="index === 2"
+                              class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px]
+                                     rounded-full px-1.5 leading-tight">
+                            {{ $notificationCount }}
+                        </span>
+                    @endif
+
                 </div>
             </button>
         </template>
@@ -53,37 +74,14 @@
             width: 0,
             pathString: '',
             
-            // --- KONFIGURASI MENU ---
             items: [
-                // Index 0: Home
-                { 
-                    icon: 'fas fa-home', 
-                    url: "{{ route('wali.home') }}" 
-                }, 
-                
-                // Index 1: Like / Disukai (Halaman Instansi yg di-like)
-                { 
-                    icon: 'fas fa-heart', 
-                    // Ganti 'wali.liked' dengan nama route yang sesuai di web.php Anda
-                    url: "{{ route('wali.liked') ?? '#' }}" 
-                }, 
-                
-                // Index 2: Notifikasi
-                { 
-                    icon: 'fas fa-bell', 
-                    // Ganti 'wali.notifications' dengan nama route yang sesuai di web.php Anda
-                    url: "{{ route('wali.notifications') ?? '#' }}" 
-                }, 
-                
-                // Index 3: Setting
-                { 
-                    icon: 'fas fa-cog', 
-                    url: "{{ route('wali.settings') }}" 
-                }   
+                { icon: 'fas fa-home',  url: "{{ route('wali.home') }}" },
+                { icon: 'fas fa-heart', url: "{{ route('wali.liked') ?? '#' }}" },
+                { icon: 'fas fa-bell',  url: "{{ route('wali.notifikasi') }}" },
+                { icon: 'fas fa-cog',   url: "{{ route('wali.settings') }}" }
             ],
 
             init() {
-                // Tentukan tab aktif berdasarkan URL saat ini
                 const currentUrl = window.location.href;
                 this.items.forEach((item, index) => {
                     if (item.url !== '#' && (currentUrl === item.url || currentUrl.startsWith(item.url))) {
@@ -91,7 +89,6 @@
                     }
                 });
 
-                // Hitung dimensi SVG
                 this.$nextTick(() => {
                     this.updateDimensions();
                     setTimeout(() => this.updateDimensions(), 100);
@@ -107,7 +104,6 @@
                 this.selectedIndex = index;
                 this.calculateMetrics();
 
-                // Logika Pindah Halaman dengan Delay Animasi
                 const url = this.items[index].url;
                 if (url && url !== '#') {
                     setTimeout(() => {
@@ -136,7 +132,6 @@
                 const height = 100;
                 const curveRadius = 38; 
 
-                // Menggambar kurva SVG
                 let p = `M 0,${topY} `;
                 p += `L ${this.activeX - curveRadius - 15},${topY} `; 
                 p += `C ${this.activeX - curveRadius},${topY} ${this.activeX - curveRadius},${topY + 40} ${this.activeX},${topY + 40} `;

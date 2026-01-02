@@ -2,53 +2,52 @@
 
 namespace App\Modules\Auth\Controllers;
 
-use App\Http\Controllers\Controller; // Pastikan extend Controller bawaan Laravel
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\Instansi\Models\Instansi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Wajib ada buat Session Login
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     /**
      * =========================
-     * LOGIN (WEB SESSION)
+     * LOGIN (MULTI ROLE - FIXED)
      * =========================
      */
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        // 1. Coba Login & Buat Session
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate(); // Security: Cegah Session Fixation
-
-            $user = Auth::user();
-
-            // 2. Arahkan User Sesuai Role
-            if ($user->role === 'wali') {
-                // Pastikan route 'wali.home' ada di web.php
-                return redirect()->route('wali.home'); 
-            } elseif ($user->role === 'pengelola') {
-                // Pastikan route dashboard pengelola ada
-                return redirect()->route('pengelola.dashboard'); 
-            } elseif ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            // Default fallback
-            return redirect('/');
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'email' => 'Email atau password salah.',
+            ])->onlyInput('email');
         }
 
-        // 3. Kalau Gagal Login
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->onlyInput('email');
+        $request->session()->regenerate();
+        $user = Auth::user();
+
+        /**
+         * 🔥 REDIRECT ABSOLUT BERDASARKAN ROLE
+         * (JANGAN PAKE route())
+         */
+        switch ($user->role) {
+            case 'pengelola':
+                return redirect()->to('/pengelola/dashboard');
+
+            case 'admin':
+                return redirect()->to('/admin/dashboard');
+
+            case 'wali':
+            default:
+                return redirect()->to('/wali/home');
+        }
     }
 
     /**
@@ -62,77 +61,78 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('wali.login');
+        return redirect()->to('/');
     }
 
     /**
      * =========================
-     * REGISTER WALI ONLY
+     * REGISTER WALI
      * =========================
      */
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'phone'    => 'nullable|string',
             'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-            'role' => 'wali',
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'phone'    => $data['phone'] ?? null,
+            'role'     => 'wali',
             'password' => Hash::make($data['password']),
         ]);
 
-        // UX: Langsung login otomatis setelah daftar
         Auth::login($user);
 
-        return redirect()->route('wali.home')->with('success', 'Registrasi berhasil! Selamat datang.');
+        return redirect()->to('/wali/home')
+            ->with('success', 'Registrasi berhasil!');
     }
 
     /**
      * =========================
      * REGISTER PENGELOLA
+     * (1 USER = 1 INSTANSI)
      * =========================
      */
     public function registerPengelola(Request $request)
     {
         $data = $request->validate([
             'nama_instansi' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'telepon' => 'required|string',
-            'alamat' => 'required|string',
-            'password' => 'required|min:6|confirmed',
+            'email'         => 'required|email|unique:users,email',
+            'telepon'       => 'required|string',
+            'alamat'        => 'required|string',
+            'password'      => 'required|min:6|confirmed',
         ]);
 
         DB::transaction(function () use ($data) {
-            // 1. Buat user pengelola
+
+            // 1️⃣ User Pengelola
             $user = User::create([
-                'name' => $data['nama_instansi'],
-                'email' => $data['email'],
-                'phone' => $data['telepon'],
-                'role' => 'pengelola',
+                'name'     => $data['nama_instansi'],
+                'email'    => $data['email'],
+                'phone'    => $data['telepon'],
+                'role'     => 'pengelola',
                 'password' => Hash::make($data['password']),
             ]);
 
-            // 2. Auto-create instansi
+            // 2️⃣ Instansi (ONE TO ONE)
             Instansi::create([
-                'pengelola_id' => $user->id,
-                'nama' => $data['nama_instansi'],
-                'lokasi' => $data['alamat'],
+                'pengelola_id'      => $user->id,
+                'nama'              => $data['nama_instansi'],
+                'lokasi'            => $data['alamat'],
                 'biaya_pendaftaran' => 0,
-                'jam_operasional' => '-',
-                'telepon' => $data['telepon'],
-                'email' => $data['email'],
-                'status' => 'pending',
+                'jam_operasional'   => '-',
+                'telepon'           => $data['telepon'],
+                'email'             => $data['email'],
+                'status'            => 'pending',
             ]);
         });
 
-        // UX: Redirect ke login karena mungkin butuh approval admin dulu (tergantung logika lu)
-        // Kalau mau auto login, pake Auth::login($user) kayak method register di atas.
-        return redirect()->route('wali.login')->with('success', 'Registrasi Pengelola berhasil. Silakan login.');
+        return redirect()->to('/pengelola/login')
+            ->with('success', 'Registrasi pengelola berhasil. Silakan login.');
     }
 }

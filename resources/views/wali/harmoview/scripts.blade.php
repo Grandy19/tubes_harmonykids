@@ -103,7 +103,9 @@ function renderCards(data) {
     const cheapestIndex = data[0].biaya < data[1].biaya ? 0 : 1;
 
     data.forEach((i, index) => {
-        const imgPath = i.image ? `/storage/${i.image}` : 'https://via.placeholder.com/150';
+    const imgPath = i.gallery_utama
+        ? `/storage/${i.gallery_utama.image_path}`
+        : 'https://via.placeholder.com/150';
         let badgeHTML = (index === cheapestIndex)
             ? `<div class="badge-pill bg-green"><i class="fa-solid fa-thumbs-up" style="margin-right:4px"></i> Hemat</div>`
             : `<div class="badge-pill bg-yellow"><i class="fa-solid fa-tag" style="margin-right:4px"></i> Pilihan</div>`;

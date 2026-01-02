@@ -16,13 +16,13 @@
 
     <div class="section-label">Kontak & Alamat</div>
     
-    <a href="tel:{{ $instansi->user->no_hp ?? '' }}" style="text-decoration:none; color:inherit;">
+    <a href="tel:{{ $instansi->telepon ?? '' }}" style="text-decoration:none; color:inherit;">
         <div class="contact-row">
             <div style="display:flex;align-items:center">
                 <div class="c-icon"><i class="fa-solid fa-phone"></i></div>
                 <div class="c-info">
                     <div>Nomor Telepon</div>
-                    <div>{{ $instansi->user->no_hp ?? '-' }}</div>
+                    <div>{{ $instansi->telepon ?? '-' }}</div>
                 </div>
             </div>
             <i class="fa-solid fa-chevron-right" style="color:#CBD5E1;"></i>

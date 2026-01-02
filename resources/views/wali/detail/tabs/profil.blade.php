@@ -1,17 +1,16 @@
 <div id="profil" class="tab-panel active">
     <div class="photo-grid">
-        @foreach($instansi->galleries->take(2) as $img)
+        @forelse($instansi->galleryProfil->take(2) as $img)
             <img src="{{ asset('storage/'.$img->image_path) }}">
-        @endforeach
-        @if($instansi->galleries->count() == 0)
-             <img src="https://via.placeholder.com/150">
-             <img src="https://via.placeholder.com/150">
-        @endif
+        @empty
+            <img src="https://via.placeholder.com/150">
+            <img src="https://via.placeholder.com/150">
+        @endforelse
     </div>
 
     <div class="section-label">Sekilas Tentang Kami</div>
     <div class="desc-text">
-        {{ $instansi->profile->deskripsi ?? 'Instansi ini berkomitmen memberikan pendidikan terbaik dengan lingkungan yang aman dan nyaman.' }}
+        {{ $instansi->profile->sekilas_tentang_kami ?? 'Instansi ini berkomitmen memberikan pendidikan terbaik dengan lingkungan yang aman dan nyaman.' }}
     </div>
 
     <div class="section-label">Program Unggulan</div>

@@ -36,12 +36,20 @@
                 list.innerHTML = '<p style="text-align:center;color:#999;">Tidak ada instansi.</p>';
             }
 
-data.forEach(item => {
-                const imgPath = item.image ? `/storage/${item.image}` : 'https://via.placeholder.com/100';
+            data.forEach(item => {
+                const utama = item.galleries?.find(g => g.category === 'utama');
+
+                const imgPath = utama
+                    ? `/storage/${utama.image_path}`
+                    : '/assets/images/school-placeholder.png';
                 
                 list.innerHTML += `
                     <div class="recom-card" onclick="window.location.href='/instansi/${item.id}'" style="cursor: pointer;">
-                        <img src="${imgPath}" class="recom-img">
+                    <img 
+                        src="${imgPath}" 
+                        class="recom-img"
+                        alt="${item.nama}"
+                        onerror="this.src='/assets/images/school-placeholder.png'">
                         <div class="recom-rating">
                             <i class="fa-solid fa-star"></i> ${item.rating ?? '5.0'}
                         </div>

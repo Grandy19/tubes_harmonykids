@@ -3,180 +3,85 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\User;
 use App\Modules\Instansi\Models\Instansi;
 use App\Modules\Instansi\Models\InstansiProfile;
 use App\Modules\Instansi\Models\InstansiGallery;
-use App\Models\User;
 
 class DummyInstansiSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ambil semua user pengelola
         $pengelolas = User::where('role', 'pengelola')->get();
 
-        // JAGA-JAGA: Kalau database kosong melompong belum ada pengelola
-        if ($pengelolas->isEmpty()) {
-            $user = User::create([
-                'name' => 'Pengelola Dummy',
-                'email' => 'pengelola_dummy@test.com',
-                'password' => bcrypt('password'),
-                'role' => 'pengelola',
-                'no_hp' => '081234567890',
-            ]);
-            $pengelolas = collect([$user]);
-        }
-
+        // =========================
+        // 12 INSTANSI
+        // TK/PG = 6 | DAYCARE = 6
+        // SETIAP BAKAT = 2
+        // =========================
         $data = [
-            // --- 1. SENI & KREATIVITAS ---
-            [
-                'nama' => 'TK Ceria Bandung',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Bandung',
-                'biaya' => 1200000,
-                'bakat' => 'Seni & Kreativitas',
-                'label' => 'Seni & Kreativitas',
-            ],
-            [
-                'nama' => 'Daycare Pelangi Bekasi',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Bekasi',
-                'biaya' => 1850000,
-                'bakat' => 'Seni & Kreativitas',
-                'label' => 'Seni & Kreativitas',
-            ],
+            // 1–2 Seni & Kreativitas
+            ['nama'=>'TK Ceria Bandung',        'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1200000, 'bakat'=>'Seni & Kreativitas', 'label'=>'Seni & Kreativitas'],
+            ['nama'=>'Daycare Pelangi Bekasi',  'jenis'=>'Daycare', 'lokasi'=>'Bekasi',    'biaya'=>1800000, 'bakat'=>'Seni & Kreativitas', 'label'=>'Seni & Kreativitas'],
 
-            // --- 2. MUSIK ---
-            [
-                'nama' => 'TK Luluby Bandung',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Bandung',
-                'biaya' => 1400000,
-                'bakat' => 'Musik',
-                'label' => 'Musik',
-            ],
-            [
-                'nama' => 'Daycare Music Surabaya',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Surabaya',
-                'biaya' => 1650000,
-                'bakat' => 'Musik',
-                'label' => 'Musik',
-            ],
+            // 3–4 Akademik Dasar
+            ['nama'=>'TK Pintar Bandung',       'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1500000, 'bakat'=>'Akademik Dasar',     'label'=>'Akademik Dasar'],
+            ['nama'=>'Daycare Cendekia',        'jenis'=>'Daycare', 'lokasi'=>'Bandung',   'biaya'=>1700000, 'bakat'=>'Akademik Dasar',     'label'=>'Akademik Dasar'],
 
-            // --- 3. SAINS & EKSPERIMEN ---
-            [
-                'nama' => 'TK Cermat Surabaya',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Surabaya',
-                'biaya' => 1600000,
-                'bakat' => 'Sains & Eksperimen',
-                'label' => 'Sains & Eksperimen',
-            ],
-            [
-                'nama' => 'Daycare Cilik Bekasi',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Bekasi',
-                'biaya' => 2100000,
-                'bakat' => 'Sains & Eksperimen',
-                'label' => 'Sains & Eksperimen',
-            ],
+            // 5–6 Sosial & Komunikasi
+            ['nama'=>'TK Bahagia Bekasi',       'jenis'=>'TK/PG',   'lokasi'=>'Bekasi',    'biaya'=>1300000, 'bakat'=>'Sosial & Komunikasi','label'=>'Sosial & Komunikasi'],
+            ['nama'=>'Daycare Sahabat',         'jenis'=>'Daycare', 'lokasi'=>'Bekasi',    'biaya'=>1900000, 'bakat'=>'Sosial & Komunikasi','label'=>'Sosial & Komunikasi'],
 
-            // --- 4. AKADEMIK DASAR ---
-            [
-                'nama' => 'TK Pintar Surabaya',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Surabaya',
-                'biaya' => 1500000,
-                'bakat' => 'Akademik Dasar',
-                'label' => 'Akademik Dasar',
-            ],
-            [
-                'nama' => 'Daycare Cendekia Bandung',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Bandung',
-                'biaya' => 1100000,
-                'bakat' => 'Akademik Dasar',
-                'label' => 'Akademik Dasar',
-            ],
+            // 7–8 Musik
+            ['nama'=>'TK Luluby Surabaya',      'jenis'=>'TK/PG',   'lokasi'=>'Surabaya',  'biaya'=>1400000, 'bakat'=>'Musik',              'label'=>'Musik'],
+            ['nama'=>'Daycare Music Kids',      'jenis'=>'Daycare', 'lokasi'=>'Surabaya',  'biaya'=>1650000, 'bakat'=>'Musik',              'label'=>'Musik'],
 
-            // --- 5. SOSIAL & KOMUNIKASI ---
-            [
-                'nama' => 'Daycare Bahagia Bekasi',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Bekasi',
-                'biaya' => 2200000,
-                'bakat' => 'Sosial & Komunikasi',
-                'label' => 'Sosial & Komunikasi',
-            ],
-            [
-                'nama' => 'Playgroup Kawan Sejati',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Bandung',
-                'biaya' => 1350000,
-                'bakat' => 'Sosial & Komunikasi',
-                'label' => 'Sosial & Komunikasi',
-            ],
+            // 9–10 Sains & Eksperimen
+            ['nama'=>'TK Cermat Bandung',       'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1550000, 'bakat'=>'Sains & Eksperimen', 'label'=>'Sains & Eksperimen'],
+            ['nama'=>'Daycare Explorer',        'jenis'=>'Daycare', 'lokasi'=>'Bandung',   'biaya'=>1750000, 'bakat'=>'Sains & Eksperimen', 'label'=>'Sains & Eksperimen'],
 
-            // --- 6. OLAHRAGA ---
-            [
-                'nama' => 'Daycare Cerah Bandung',
-                'jenis' => 'Daycare',
-                'lokasi' => 'Bandung',
-                'biaya' => 2000000,
-                'bakat' => 'Olahraga',
-                'label' => 'Olahraga',
-            ],
-            [
-                'nama' => 'TK Tunas Juara Surabaya',
-                'jenis' => 'TK/PG',
-                'lokasi' => 'Surabaya',
-                'biaya' => 1750000,
-                'bakat' => 'Olahraga',
-                'label' => 'Olahraga',
-            ],
+            // 11–12 Olahraga
+            ['nama'=>'TK Tunas Juara',           'jenis'=>'TK/PG',   'lokasi'=>'Surabaya',  'biaya'=>1600000, 'bakat'=>'Olahraga',           'label'=>'Olahraga'],
+            ['nama'=>'Daycare Aktif Ceria',      'jenis'=>'Daycare', 'lokasi'=>'Surabaya',  'biaya'=>2000000, 'bakat'=>'Olahraga',           'label'=>'Olahraga'],
         ];
 
-        foreach ($data as $index => $item) {
-            $userIndex = $index % $pengelolas->count();
-            $selectedUser = $pengelolas[$userIndex];
+        foreach ($pengelolas as $index => $pengelola) {
 
-            if (Instansi::where('nama', $item['nama'])->exists()) {
+            if (!isset($data[$index])) break;
+
+            $item = $data[$index];
+
+            // 1 pengelola = 1 instansi
+            if (Instansi::where('pengelola_id', $pengelola->id)->exists()) {
                 continue;
             }
 
             $instansi = Instansi::create([
-                'pengelola_id' => $selectedUser->id,
-                'nama' => $item['nama'],
-                'jenis' => $item['jenis'],
-                'lokasi' => $item['lokasi'],
-                'bakat' => $item['bakat'],
-                'label' => $item['label'],
+                'pengelola_id'      => $pengelola->id,
+                'nama'              => $item['nama'],
+                'jenis'             => $item['jenis'],
+                'lokasi'            => $item['lokasi'],
+                'bakat'             => $item['bakat'],
+                'label'             => $item['label'],
                 'biaya_pendaftaran' => $item['biaya'],
-                'jam_operasional' => '07.00 - 16.00',
-                'telepon' => '08123456789',
-                'email' => strtolower(str_replace(' ', '', $item['nama'])) . '@test.com',
-                'status' => 'approved',
+                'jam_operasional'   => '07.00 - 16.00',
+                'telepon'           => '08123456789',
+                'email'             => strtolower(str_replace(' ', '', $item['nama'])) . '@test.com',
+                'status'            => 'approved',
             ]);
 
             InstansiProfile::create([
                 'instansi_id' => $instansi->id,
-                'sekilas_tentang_kami' => 'Data dummy untuk pengujian fitur.',
+                'sekilas_tentang_kami' => 'Data dummy untuk pengujian aplikasi HarmonyKids.',
                 'program_pembelajaran' => 'Calistung, Motorik, Sosial',
             ]);
 
-            // PERBAIKAN DISINI: image_path diisi string, bukan null
+            // Galeri wajib
             InstansiGallery::insert([
-                [
-                    'instansi_id' => $instansi->id,
-                    'image_path' => 'instansi/default.jpg', // <--- GANTI NULL JADI STRING
-                    'category' => 'ruangan',
-                ],
-                [
-                    'instansi_id' => $instansi->id,
-                    'image_path' => 'instansi/default.jpg', // <--- GANTI NULL JADI STRING
-                    'category' => 'sdm',
-                ],
+                ['instansi_id'=>$instansi->id,'image_path'=>'instansi/default.jpg','category'=>'utama'],
+                ['instansi_id'=>$instansi->id,'image_path'=>'instansi/default.jpg','category'=>'profil'],
+                ['instansi_id'=>$instansi->id,'image_path'=>'instansi/default.jpg','category'=>'fasilitas'],
+                ['instansi_id'=>$instansi->id,'image_path'=>'instansi/default.jpg','category'=>'sdm'],
             ]);
         }
     }

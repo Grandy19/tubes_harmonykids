@@ -92,9 +92,9 @@ function renderList(data) {
     }
 
     container.innerHTML = data.map(item => {
-        const imgPath = item.image
-            ? `/storage/${item.image.replace('public/', '')}`
-            : 'https://via.placeholder.com/200x200/E2E8F0/94A3B8?text=No+Image';
+        const imgPath = item.gallery_utama
+            ? `/storage/${item.gallery_utama.image_path}`
+            : '/assets/images/school-placeholder.png';
 
         const price = new Intl.NumberFormat('id-ID').format(item.biaya_pendaftaran || 0);
 

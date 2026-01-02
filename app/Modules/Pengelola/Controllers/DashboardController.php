@@ -11,32 +11,40 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil instansi milik pengelola
+        // Ambil instansi milik pengelola (1 pengelola = 1 instansi)
         $instansi = Instansi::where('pengelola_id', $request->user()->id)
             ->firstOrFail();
 
-        // Hitung pendaftaran
+        // =====================
+        // STATISTIK PENDAFTARAN
+        // =====================
         $total = Pendaftaran::where('instansi_id', $instansi->id)->count();
+
         $pending = Pendaftaran::where('instansi_id', $instansi->id)
             ->where('status', 'pending')
             ->count();
-        $approved = Pendaftaran::where('instansi_id', $instansi->id)
-            ->where('status', 'approved')
+
+        $accepted = Pendaftaran::where('instansi_id', $instansi->id)
+            ->where('status', 'accepted')
             ->count();
+
         $rejected = Pendaftaran::where('instansi_id', $instansi->id)
             ->where('status', 'rejected')
             ->count();
 
+        // =====================
+        // RESPONSE (API STYLE)
+        // =====================
         return response()->json([
             'instansi' => [
-                'id' => $instansi->id,
-                'nama' => $instansi->nama,
-                'status' => $instansi->status,
+                'id'     => $instansi->id,
+                'nama'   => $instansi->nama,
+                'status' => $instansi->status, // status instansi (pending / approved)
             ],
             'pendaftaran' => [
-                'total' => $total,
-                'pending' => $pending,
-                'approved' => $approved,
+                'total'    => $total,
+                'pending'  => $pending,
+                'accepted' => $accepted,
                 'rejected' => $rejected,
             ],
         ]);
