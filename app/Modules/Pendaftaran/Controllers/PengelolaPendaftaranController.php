@@ -11,7 +11,7 @@ class PengelolaPendaftaranController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | API (JANGAN DIUBAH)
+    | API 
     |--------------------------------------------------------------------------
     */
 
@@ -104,7 +104,7 @@ class PengelolaPendaftaranController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | WEB ACTION (REDIRECT, BUKAN JSON)
+    | WEB ACTION 
     |--------------------------------------------------------------------------
     */
 

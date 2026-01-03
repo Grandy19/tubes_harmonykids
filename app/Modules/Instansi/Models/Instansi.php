@@ -35,7 +35,7 @@ class Instansi extends Model
     }
 
     /**
-     * 🔥 RELASI UMUM (WAJIB UNTUK API / HARMOFIND)
+     * RELASI UMUM (UNTUK API / HARMOFIND)
      */
     public function galleries()
     {

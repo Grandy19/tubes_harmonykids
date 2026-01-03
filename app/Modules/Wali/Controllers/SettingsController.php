@@ -3,25 +3,25 @@
 namespace App\Modules\Wali\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;              // PENTING: Untuk menangkap input
+use Illuminate\Http\Request;              
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;      // PENTING: Untuk enkripsi password
+use Illuminate\Support\Facades\Hash;      
 
 class SettingsController extends Controller
 {
-    // 1. Menampilkan Halaman Setting
+    // Menampilkan Halaman Setting
     public function index()
     {
         $user = Auth::user();
         return view('wali.settings.index', compact('user'));
     }
 
-    // 2. Proses Update Password (AJAX)
+    // Proses Update Password (AJAX)
     public function updatePassword(Request $request)
     {
         // Validasi Input
         $request->validate([
-            'password' => 'required|min:6|confirmed', // 'confirmed' mengecek input 'password_confirmation'
+            'password' => 'required|min:6|confirmed', 
         ]);
 
         // Ambil user yang sedang login

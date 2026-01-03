@@ -12,7 +12,7 @@ class AdminController extends Controller
 {
     /**
      * =========================
-     * PROTEKSI ADMIN (SIMPLE)
+     * PROTEKSI ADMIN 
      * =========================
      */
     private function onlyAdmin()

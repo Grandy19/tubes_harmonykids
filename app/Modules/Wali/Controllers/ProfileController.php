@@ -10,7 +10,7 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
-    // Helper function buat Mode Demo (Biar gak null saat testing)
+    // Helper function buat Mode Demo 
     private function getTargetUser()
     {
         // Prioritas 1: User yang login
@@ -18,8 +18,6 @@ class ProfileController extends Controller
             return Auth::user();
         }
         
-        // Prioritas 2 (DEMO MODE): Ambil user pertama di database
-        // PENTING: Pastikan di tabel users lu ADA isinya minimal 1
         $user = User::first();
         
         if (!$user) {
@@ -42,7 +40,7 @@ class ProfileController extends Controller
         $currentUser = $this->getTargetUser();
         $user = User::find($currentUser->id); 
 
-        // 1. Validasi Input
+        // Validasi Input
         $request->validate([
             'name'          => 'required|string|max:255',
             'email'         => 'required|email|unique:users,email,' . $user->id,
@@ -54,14 +52,14 @@ class ProfileController extends Controller
             'alamat'        => 'nullable|string',
         ]);
 
-        // 2. Logic Simpan Foto (SUDAH DIPERBAIKI)
+        // Logic Simpan Foto (SUDAH DIPERBAIKI)
         if ($request->hasFile('foto_profil')) {
             // Hapus foto lama jika ada di storage (biar gak numpuk sampah file)
             if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
                 Storage::disk('public')->delete($user->foto_profil);
             }
 
-            // Simpan foto baru ke folder 'uploads/profil' di disk public
+            // Simpan foto baru ke folder 'uploads/profil' di public
             $path = $request->file('foto_profil')->store('uploads/profil', 'public');
             $user->foto_profil = $path;
         }
@@ -69,11 +67,7 @@ class ProfileController extends Controller
         // 3. Update Data Teks
         $user->name = $request->name;
         $user->email = $request->email;
-        
-        // MAPPING: Database 'phone' diisi dari Input 'no_telepon'
         $user->phone = $request->no_telepon; 
-
-        // Field tambahan
         $user->jenis_kelamin = $request->jenis_kelamin;
         $user->pekerjaan = $request->pekerjaan;
         $user->hubungan_dengan_anak = $request->hubungan_dengan_anak;

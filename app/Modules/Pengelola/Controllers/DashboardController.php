@@ -39,7 +39,7 @@ class DashboardController extends Controller
             'instansi' => [
                 'id'     => $instansi->id,
                 'nama'   => $instansi->nama,
-                'status' => $instansi->status, // status instansi (pending / approved)
+                'status' => $instansi->status, 
             ],
             'pendaftaran' => [
                 'total'    => $total,

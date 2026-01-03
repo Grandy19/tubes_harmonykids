@@ -22,15 +22,8 @@ class HarmoTalentController extends Controller
     {
         // Ambil parameter dari URL
         $bakat = $request->query('bakat');
-        $kategori = $request->query('kategori'); // boleh null
-        $sort = $request->query('sort');         // boleh null
-
-        /**
-         * CATATAN PENTING:
-         * - Controller ini TIDAK melakukan query database
-         * - Semua data akan diambil via AJAX (API Instansi)
-         * - Ini agar HarmoTalent konsisten dengan HarmoFind
-         */
+        $kategori = $request->query('kategori'); 
+        $sort = $request->query('sort');         
 
         return view(
             'wali.harmotalent.result.index',

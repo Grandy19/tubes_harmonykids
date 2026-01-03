@@ -39,9 +39,6 @@ class AdminAuthController extends Controller
         ]);
     }
 
-    /**
-     * ✅ INI YANG KAMU BELUM PUNYA
-     */
     public function logout(Request $request)
     {
         Auth::logout();

@@ -42,7 +42,7 @@ class DummyForumSeeder extends Seeder
                 'wali_id' => $wali->id,
                 'content' => $post['content'],
                 'likes' => $post['likes'],
-                'image' => null, // dummy tanpa image dulu
+                'image' => null, 
             ]);
         }
     }

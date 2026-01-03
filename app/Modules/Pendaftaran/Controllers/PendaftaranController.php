@@ -16,7 +16,7 @@ class PendaftaranController extends Controller
     // =========================================================================
 
     /**
-     * 1. MENAMPILKAN HALAMAN FORMULIR (Method ini yang dipanggil tombol 'Daftar Sekarang')
+     * MENAMPILKAN HALAMAN FORMULIR 
      */
     public function create($instansi_id)
     {
@@ -28,7 +28,7 @@ class PendaftaranController extends Controller
     }
 
     /**
-     * 2. MEMPROSES DATA PENDAFTARAN (Saat tombol 'Kirim' diklik)
+     * 2. MEMPROSES DATA PENDAFTARAN 
      */
     public function store(Request $request)
     {
@@ -41,32 +41,29 @@ class PendaftaranController extends Controller
             'alamat'            => 'required|string',
             'riwayat_kesehatan' => 'nullable|string',
             'kewarganegaraan'   => 'required|string',
-            // Pastikan 'agama' ada di migration jika ingin disimpan. 
-            // Jika belum ada di database, hapus baris ini agar tidak error.
             'agama'             => 'nullable|string', 
-            'bukti_pembayaran'  => 'required|image|max:2048', // Max 2MB
+            'bukti_pembayaran'  => 'required|image|max:2048', 
         ]);
 
-        // B. Upload File Bukti Pembayaran
+        // Upload File Bukti Pembayaran
         $path = $request->file('bukti_pembayaran')
             ->store('bukti-pembayaran', 'public');
 
-        // C. Simpan ke Database
+        // Simpan ke Database
         Pendaftaran::create([
             'instansi_id'       => $data['instansi_id'],
-            'wali_id'           => $request->user()->id, // Ambil ID user yang sedang login
+            'wali_id'           => $request->user()->id, 
             'nama_anak'         => $data['nama_anak'],
             'ttl'               => $data['ttl'],
             'jenis_kelamin'     => $data['jenis_kelamin'],
             'alamat'            => $data['alamat'],
             'riwayat_kesehatan' => $data['riwayat_kesehatan'],
             'kewarganegaraan'   => $data['kewarganegaraan'],
-            // 'agama'          => $data['agama'], // Uncomment jika kolom agama sudah ada di DB
             'bukti_pembayaran'  => $path,
-            'status'            => 'pending', // Default status menunggu konfirmasi
+            'status'            => 'pending', 
         ]);
 
-        // D. Redirect kembali ke Home dengan pesan sukses
+        // Redirect kembali ke Home dengan pesan sukses
         return redirect()->back()->with(
             'success',
             'Pendaftaran berhasil dikirim! Mohon tunggu konfirmasi admin.'

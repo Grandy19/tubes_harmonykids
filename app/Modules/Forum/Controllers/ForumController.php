@@ -11,7 +11,7 @@ use App\Modules\Forum\Models\ForumLike;    // Pastikan Model ini ada
 
 class ForumController extends Controller
 {
-    // 1. TAMPILKAN HALAMAN UTAMA (Gabungan Index & Mine)
+    // TAMPILKAN HALAMAN UTAMA (Gabungan Index & Mine)
     public function index(Request $request)
     {
         // Ambil parameter dari URL (default 'all' dan 'latest')
@@ -27,9 +27,9 @@ class ForumController extends Controller
             $query->where('wali_id', $user->id);
         }
 
-        // Logic Sorting (Sesuai kode teman Anda)
+        // Logic Sorting 
         if ($sort === 'popular') {
-            $query->orderByDesc('likes'); // Asumsi ada kolom 'likes' (counter) di tabel
+            $query->orderByDesc('likes'); 
         } elseif ($sort === 'recommend') {
             $query->orderByDesc('likes')->latest();
         } else {
@@ -45,17 +45,17 @@ class ForumController extends Controller
             ->pluck('forum_post_id') // Sesuaikan nama kolom foreign key post
             ->toArray();
 
-        // Return ke View (Bukan return JSON langsung)
+        // Return ke View 
         return view('wali.harmotalk.index', compact('posts', 'tab', 'sort', 'likedPostIds'));
     }
 
-    // 2. HALAMAN FORM CREATE (Jika view dipisah)
+    // HALAMAN FORM CREATE (Jika view dipisah)
     public function create()
     {
         return view('wali.harmotalk.create');
     }
 
-    // 3. SIMPAN POST BARU
+    // SIMPAN POST BARU
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -110,7 +110,7 @@ class ForumController extends Controller
         ]);
     }
 
-    // 5. AMBIL KOMENTAR (AJAX)
+    // AMBIL KOMENTAR (AJAX)
     public function getComments($id)
     {
         $comments = ForumComment::with('wali')
@@ -128,7 +128,7 @@ class ForumController extends Controller
         return response()->json($comments);
     }
 
-    // 6. KIRIM KOMENTAR (AJAX)
+    // KIRIM KOMENTAR (AJAX)
     public function storeComment(Request $request, $id)
     {
         $request->validate(['comment' => 'required']);

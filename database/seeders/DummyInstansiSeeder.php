@@ -13,34 +13,28 @@ class DummyInstansiSeeder extends Seeder
     public function run(): void
     {
         $pengelolas = User::where('role', 'pengelola')->get();
-
-        // =========================
-        // 12 INSTANSI
-        // TK/PG = 6 | DAYCARE = 6
-        // SETIAP BAKAT = 2
-        // =========================
         $data = [
-            // 1–2 Seni & Kreativitas
+            // Seni & Kreativitas
             ['nama'=>'TK Ceria Bandung',        'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1200000, 'bakat'=>'Seni & Kreativitas', 'label'=>'Seni & Kreativitas'],
             ['nama'=>'Daycare Pelangi Bekasi',  'jenis'=>'Daycare', 'lokasi'=>'Bekasi',    'biaya'=>1800000, 'bakat'=>'Seni & Kreativitas', 'label'=>'Seni & Kreativitas'],
 
-            // 3–4 Akademik Dasar
+            // Akademik Dasar
             ['nama'=>'TK Pintar Bandung',       'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1500000, 'bakat'=>'Akademik Dasar',     'label'=>'Akademik Dasar'],
             ['nama'=>'Daycare Cendekia',        'jenis'=>'Daycare', 'lokasi'=>'Bandung',   'biaya'=>1700000, 'bakat'=>'Akademik Dasar',     'label'=>'Akademik Dasar'],
 
-            // 5–6 Sosial & Komunikasi
+            // Sosial & Komunikasi
             ['nama'=>'TK Bahagia Bekasi',       'jenis'=>'TK/PG',   'lokasi'=>'Bekasi',    'biaya'=>1300000, 'bakat'=>'Sosial & Komunikasi','label'=>'Sosial & Komunikasi'],
             ['nama'=>'Daycare Sahabat',         'jenis'=>'Daycare', 'lokasi'=>'Bekasi',    'biaya'=>1900000, 'bakat'=>'Sosial & Komunikasi','label'=>'Sosial & Komunikasi'],
 
-            // 7–8 Musik
+            // Musik
             ['nama'=>'TK Luluby Surabaya',      'jenis'=>'TK/PG',   'lokasi'=>'Surabaya',  'biaya'=>1400000, 'bakat'=>'Musik',              'label'=>'Musik'],
             ['nama'=>'Daycare Music Kids',      'jenis'=>'Daycare', 'lokasi'=>'Surabaya',  'biaya'=>1650000, 'bakat'=>'Musik',              'label'=>'Musik'],
 
-            // 9–10 Sains & Eksperimen
+            // Sains & Eksperimen
             ['nama'=>'TK Cermat Bandung',       'jenis'=>'TK/PG',   'lokasi'=>'Bandung',   'biaya'=>1550000, 'bakat'=>'Sains & Eksperimen', 'label'=>'Sains & Eksperimen'],
             ['nama'=>'Daycare Explorer',        'jenis'=>'Daycare', 'lokasi'=>'Bandung',   'biaya'=>1750000, 'bakat'=>'Sains & Eksperimen', 'label'=>'Sains & Eksperimen'],
 
-            // 11–12 Olahraga
+            // Olahraga
             ['nama'=>'TK Tunas Juara',           'jenis'=>'TK/PG',   'lokasi'=>'Surabaya',  'biaya'=>1600000, 'bakat'=>'Olahraga',           'label'=>'Olahraga'],
             ['nama'=>'Daycare Aktif Ceria',      'jenis'=>'Daycare', 'lokasi'=>'Surabaya',  'biaya'=>2000000, 'bakat'=>'Olahraga',           'label'=>'Olahraga'],
         ];

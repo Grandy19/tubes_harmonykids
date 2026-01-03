@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
     /**
      * =========================
-     * LOGIN (MULTI ROLE - FIXED)
+     * LOGIN 
      * =========================
      */
     public function login(Request $request)
@@ -34,8 +34,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         /**
-         * 🔥 REDIRECT ABSOLUT BERDASARKAN ROLE
-         * (JANGAN PAKE route())
+         * REDIRECT ABSOLUT BERDASARKAN ROLE
          */
         switch ($user->role) {
             case 'pengelola':
@@ -110,7 +109,7 @@ class AuthController extends Controller
 
         DB::transaction(function () use ($data) {
 
-            // 1️⃣ User Pengelola
+            // User Pengelola
             $user = User::create([
                 'name'     => $data['nama_instansi'],
                 'email'    => $data['email'],
@@ -119,7 +118,7 @@ class AuthController extends Controller
                 'password' => Hash::make($data['password']),
             ]);
 
-            // 2️⃣ Instansi (ONE TO ONE)
+            // Instansi (ONE TO ONE)
             Instansi::create([
                 'pengelola_id'      => $user->id,
                 'nama'              => $data['nama_instansi'],
