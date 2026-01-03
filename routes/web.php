@@ -11,6 +11,8 @@ use App\Modules\Forum\Controllers\ForumController;
 use App\Modules\Wali\Controllers\LikedController;
 use App\Modules\Pengelola\Controllers\InstansiPengelolaController;
 use App\Modules\Pendaftaran\Controllers\PengelolaPendaftaranController;
+use App\Modules\Admin\Controllers\AdminController;
+use App\Modules\Admin\Controllers\AdminAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +43,12 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/pengelola/register', fn () => view('pengelola.auth.register'))->name('pengelola.register');
     Route::post('/pengelola/register', [AuthController::class, 'registerPengelola'])
         ->name('pengelola.register.process');
+
+    Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])
+        ->name('admin.login');
+
+    Route::post('/admin/login', [AdminAuthController::class, 'login'])
+        ->name('admin.login.process');
 });
 
 /*
@@ -152,3 +160,43 @@ Route::middleware(['auth', 'role:pengelola'])
             [InstansiPengelolaController::class, 'update']
         )->name('pengelola.instansi.update');
     });
+
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED ADMIN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->group(function () {
+
+        Route::post('/logout', [AdminAuthController::class, 'logout'])
+            ->name('admin.logout');
+
+        Route::get('/dashboard', [AdminController::class, 'index'])
+            ->name('admin.dashboard');
+
+        Route::get('/users', [AdminController::class, 'users'])
+            ->name('admin.users');
+
+        Route::get('/admin/users/{id}', [AdminController::class, 'showUser'])
+            ->name('admin.users.show');
+
+        Route::get('/forum', [AdminController::class, 'forum'])
+            ->name('admin.forum');
+
+        Route::delete('/forum/{id}', [AdminController::class, 'deleteForum'])
+            ->name('admin.forum.delete');
+
+        Route::get('/instansi', [AdminController::class, 'instansi'])
+            ->name('admin.instansi');
+        
+        Route::get('/admin/instansi/{id}', [AdminController::class, 'show'])
+            ->name('admin.instansi.show');
+
+        Route::patch('/instansi/{id}/approve', [AdminController::class, 'approveInstansi'])
+            ->name('admin.instansi.approve');
+
+        Route::delete('/instansi/{id}', [AdminController::class, 'deleteInstansi'])
+            ->name('admin.instansi.delete');
+});

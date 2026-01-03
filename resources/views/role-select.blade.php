@@ -97,8 +97,8 @@
         </div>
     </a>
 
-    {{-- ADMIN --}}
-    <a href="/admin/login" class="role-btn">
+    {{-- ADMIN (FIXED) --}}
+    <a href="{{ route('admin.login') }}" class="role-btn">
         <i class="fa-solid fa-user-shield role-icon"></i>
         <div>
             <div class="role-title">Admin Sistem</div>
