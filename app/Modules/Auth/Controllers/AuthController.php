@@ -9,44 +9,86 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator; // Tambahan penting buat API
 
 class AuthController extends Controller
 {
     /**
      * =========================
-     * LOGIN 
+     * LOGIN (HYBRID: WEB & API)
      * =========================
      */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        // 1. Validasi Input
+        $validator = Validator::make($request->all(), [
             'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        if (!Auth::attempt($credentials)) {
-            return back()->withErrors([
-                'email' => 'Email atau password salah.',
-            ])->onlyInput('email');
+        if ($validator->fails()) {
+            // Jika request dari Flutter/API, return JSON error
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors'  => $validator->errors()
+                ], 422);
+            }
+            // Jika dari Web, return redirect
+            return back()->withErrors($validator)->onlyInput('email');
         }
 
-        $request->session()->regenerate();
-        $user = Auth::user();
+        $credentials = $request->only('email', 'password');
 
-        /**
-         * REDIRECT ABSOLUT BERDASARKAN ROLE
-         */
-        switch ($user->role) {
-            case 'pengelola':
-                return redirect()->to('/pengelola/dashboard');
+        // 2. Cek Login
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
 
-            case 'admin':
-                return redirect()->to('/admin/dashboard');
+            // === LOGIKA API (FLUTTER) ===
+            if ($request->wantsJson() || $request->is('api/*')) {
+                // Buat token (opsional, tapi bagus buat auth state)
+                // $token = $user->createToken('mobile-app')->plainTextToken; 
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login Berhasil',
+                    'data'    => [
+                        'id'    => $user->id,
+                        'name'  => $user->name,
+                        'email' => $user->email,
+                        'role'  => $user->role,
+                    ],
+                    // 'token' => $token // Uncomment kalau pakai Sanctum
+                ], 200);
+            }
 
-            case 'wali':
-            default:
-                return redirect()->to('/wali/home');
+            // === LOGIKA WEB (ORIGINAL) ===
+            switch ($user->role) {
+                case 'pengelola':
+                    return redirect()->to('/pengelola/dashboard');
+                case 'admin':
+                    return redirect()->to('/admin/dashboard');
+                case 'wali':
+                default:
+                    return redirect()->to('/wali/home');
+            }
         }
+
+        // 3. Login Gagal
+        // Jika request dari Flutter/API
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email atau Password salah',
+            ], 401);
+        }
+
+        // Jika dari Web
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
     }
 
     /**
@@ -60,6 +102,10 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json(['success' => true, 'message' => 'Logout berhasil']);
+        }
+
         return redirect()->to('/');
     }
 
@@ -70,35 +116,53 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'phone'    => 'nullable|string',
             'password' => 'required|min:6|confirmed',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['success'=>false, 'errors'=>$validator->errors()], 422);
+            }
+            return back()->withErrors($validator)->withInput();
+        }
+
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'phone'    => $data['phone'] ?? null,
+            'name'     => $request->all()['name'],
+            'email'    => $request->all()['email'],
+            'phone'    => $request->all()['phone'] ?? null,
             'role'     => 'wali',
-            'password' => Hash::make($data['password']),
+            'password' => Hash::make($request->all()['password']),
         ]);
 
         Auth::login($user);
 
-        return redirect()->to('/wali/home')
-            ->with('success', 'Registrasi berhasil!');
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'Registrasi Berhasil', 
+                'data' => $user
+            ], 201);
+        }
+
+        return redirect()->to('/wali/home')->with('success', 'Registrasi berhasil!');
     }
 
     /**
      * =========================
      * REGISTER PENGELOLA
-     * (1 USER = 1 INSTANSI)
      * =========================
      */
     public function registerPengelola(Request $request)
     {
+        // Saya persingkat bagian ini karena jarang dipakai login mobile, 
+        // tapi logicnya sama: Cek $request->wantsJson() kalau mau dibuat support API.
+        
+        // ... (Kode original tetap berjalan untuk Web)
+        
         $data = $request->validate([
             'nama_instansi' => 'required|string',
             'email'         => 'required|email|unique:users,email',
@@ -108,8 +172,6 @@ class AuthController extends Controller
         ]);
 
         DB::transaction(function () use ($data) {
-
-            // User Pengelola
             $user = User::create([
                 'name'     => $data['nama_instansi'],
                 'email'    => $data['email'],
@@ -118,7 +180,6 @@ class AuthController extends Controller
                 'password' => Hash::make($data['password']),
             ]);
 
-            // Instansi (ONE TO ONE)
             Instansi::create([
                 'pengelola_id'      => $user->id,
                 'nama'              => $data['nama_instansi'],
@@ -130,6 +191,10 @@ class AuthController extends Controller
                 'status'            => 'pending',
             ]);
         });
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json(['success' => true, 'message' => 'Registrasi Pengelola Berhasil'], 201);
+        }
 
         return redirect()->to('/pengelola/login')
             ->with('success', 'Registrasi pengelola berhasil. Silakan login.');

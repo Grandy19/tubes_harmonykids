@@ -22,18 +22,18 @@
                 {{-- Tab: Post Saya --}}
                 <a class="tab-pill {{ $tab === 'mine' ? 'active' : '' }}" 
                    href="{{ route('wali.harmotalk', ['tab' => 'mine', 'sort' => $sort]) }}">
-                   Post Saya
+                   Post
                 </a>
                 
                 {{-- Sort Dropdown (Posisi Kanan) --}}
-                <div class="sort-dd">
-                    <button type="button" class="tab-pill sort" onclick="toggleSortMenu(event)">
-                        <span style="font-weight: 800;">
-                            {{ $sort === 'popular' ? 'Terpopuler' : 'Terbaru' }}
-                        </span>
-                        {{-- Ikon Chevron Biru --}}
-                        <i class="fa-solid fa-chevron-down text-[#3577E5] text-xs ml-2"></i>
-                    </button>
+<div class="sort-dd">
+    <button type="button" class="tab-pill sort sort-blue"
+            onclick="toggleSortMenu(event)">
+        <span class="sort-text">
+            {{ $sort === 'popular' ? 'Terpopuler' : 'Terbaru' }}
+        </span>
+        <i class="fa-solid fa-chevron-down sort-icon"></i>
+    </button>
                     
                     {{-- Menu List --}}
                     <div class="sort-menu" id="sortMenu">

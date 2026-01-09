@@ -1,20 +1,39 @@
 @push('styles')
 <style>
-    /* GUE PERTAHANIN STYLE ASLI LO */
-    .mobile-card {
-        background: linear-gradient(180deg, #0F3974 0%, #2E7CF6 100%);
-        display: flex; flex-direction: column; padding: 30px; min-height: 850px;
+    .safe-bottom-padding, 
+    .safe-area-bottom {
+        display: none !important;
+        background-color: transparent !important;
+        height: 0 !important;
+        width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
+
+    .mobile-card {
+        /* Background Gradient Biru Full */
+        background: linear-gradient(180deg, #0F3974 0%, #2E7CF6 100%);
+        display: flex; 
+        flex-direction: column; 
+        padding: 30px;
+        
+        /* Tinggi mengikuti layar HP & Scroll di dalam */
+        height: 100%; 
+        overflow-y: auto; 
+    }
+
     .btn-back {
-        position: absolute; top: 25px; left: 25px; width: 45px; height: 45px;
+        position: absolute; top: 25px; width: 45px; height: 45px;
         background: white; border-radius: 50%; display: flex; align-items: center;
         justify-content: center; color: #1A73E8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         text-decoration: none; z-index: 20; font-size: 22px;
     }
+
     .plane-img {
         width: 100%; max-width: 320px; margin-top: 40px; align-self: center;
         transform: translateY(-10px); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
     }
+
     .headline { text-align: center; color: white; margin-bottom: 30px; }
     .headline h1 { font-weight: 800; font-size: 32px; margin: 0; }
     .headline p { font-size: 16px; margin-top: 5px; opacity: 0.95; }

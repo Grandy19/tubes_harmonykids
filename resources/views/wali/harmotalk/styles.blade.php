@@ -26,7 +26,7 @@
         position: absolute;
         top: 0; left: 0; right: 0; bottom: 0;
         padding-top: 240px; /* Jarak dari atas */
-        /* padding-bottom: 120px;  */
+        padding-bottom: 120px; 
         overflow-y: auto; 
         z-index: 5;
         background: #F8FAFC;
@@ -51,16 +51,12 @@
 
     /* GAYA TAB */
     .tab-pill {
-        background: white; 
-        color: #64748B; /* Warna teks default (abu) */
-        padding: 12px 25px; 
-        border-radius: 12px; 
-        font-weight: 700; font-size: 13px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-        border: 1px solid transparent;
-        text-decoration: none;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background: white; color: #64748B; padding: 10px 16px; 
+        white-space: nowrap; /* Mencegah teks turun */
+        border-radius: 12px; font-weight: 700; font-size: 13px; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s; 
+        border: 1px solid transparent; 
+        flex-shrink: 0;
     }
     
     /* Efek Tekan */
@@ -203,5 +199,6 @@
     /* Animation Keyframes */
     @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
 </style>
 @endpush

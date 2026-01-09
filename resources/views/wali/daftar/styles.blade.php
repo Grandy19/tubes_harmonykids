@@ -73,7 +73,7 @@
         overflow-y: auto; 
         
         /* PADDING */
-        padding: 30px 24px 10px; 
+        padding: 30px 24px 120px; 
         
         box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
         

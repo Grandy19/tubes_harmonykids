@@ -1,6 +1,6 @@
 <div class="detail-container">
 
-    {{-- LAYER 1: HERO IMAGE --}}
+    {{-- LAYER 1: HERO IMAGE + OVERLAY GELAP --}}
     <div class="hero-layer">
         @php
             $bg = $instansi->galleryUtama
@@ -11,7 +11,12 @@
                 ->likedInstansis
                 ->contains($instansi->id);
         @endphp
+        
+        {{-- Gambar Asli --}}
         <img src="{{ $bg }}" class="hero-img">
+        
+        {{-- INI YANG HILANG KEMARIN: DIV UNTUK GELAPNYA --}}
+        <div class="hero-overlay"></div> 
     </div>
 
     {{-- LAYER 2: HEADER & INFO --}}
@@ -22,8 +27,7 @@
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
 
-            <form action="{{ route('wali.instansi.like', $instansi->id) }}"
-                  method="POST">
+            <form action="{{ route('wali.instansi.like', $instansi->id) }}" method="POST">
                 @csrf
                 <button type="submit" class="nav-btn">
                     <i class="fa-{{ $isLiked ? 'solid' : 'regular' }} fa-heart"></i>
@@ -58,5 +62,7 @@
         @include('wali.detail.tabs.fasilitas')
         @include('wali.detail.tabs.detail')
 
+        {{-- Spacer Bawah (Biar tombol daftar ga ketutupan pas scroll mentok) --}}
+        <div style="height: 100px;"></div>
     </div>
 </div>

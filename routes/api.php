@@ -2,23 +2,154 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
+
+// CONTROLLERS
+use App\Modules\Auth\Controllers\AuthController;
+use App\Modules\Wali\Controllers\ProfileController;
+use App\Modules\Wali\Controllers\SettingsController;
+use App\Modules\Wali\Controllers\LikedController;
+use App\Modules\Wali\Controllers\NotifikasiController;
+use App\Modules\Instansi\Controllers\InstansiController;
+use App\Modules\Forum\Controllers\ForumController;
+use App\Modules\HarmoTalent\Controllers\HarmoTalentController;
+use App\Modules\Pendaftaran\Controllers\PendaftaranController;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes - HarmonyKids Mobile
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| 
+| API endpoints untuk Flutter mobile app.
+| Semua endpoint protected menggunakan auth:sanctum middleware.
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// ============================================================================
+// PUBLIC ROUTES (Tidak perlu login)
+// ============================================================================
+
+// Health Check
+Route::get('/test', function(){
+    return response()->json([
+        'status' => 'success', 
+        'message' => 'API HarmonyKids Ready',
+        'timestamp' => now()->toISOString()
+    ], 200);
 });
 
-Route::get('/users', function () {
-    return User::get()->all();
-})->name('Login.Page');
+// Authentication
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register/wali', [AuthController::class, 'register']);
+Route::post('/register/pengelola', [AuthController::class, 'registerPengelola']);
+
+// ============================================================================
+// PROTECTED ROUTES (Harus login dengan Sanctum token)
+// ============================================================================
+
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // ------------------------------------------------------------------------
+    // AUTH & USER
+    // ------------------------------------------------------------------------
+    
+    // Get current authenticated user
+    Route::get('/user', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'data' => $request->user()
+        ]);
+    });
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // ------------------------------------------------------------------------
+    // PROFILE MANAGEMENT
+    // ------------------------------------------------------------------------
+    
+    // Get user profile
+    Route::get('/profile', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'data' => $request->user()
+        ]);
+    });
+    
+    // Update profile
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile', [ProfileController::class, 'update']); // Support POST for multipart/form-data
+    
+    // Change password
+    Route::put('/settings/password', [SettingsController::class, 'updatePassword']);
+    
+    // ------------------------------------------------------------------------
+    // INSTANSI (Institution Management)
+    // ------------------------------------------------------------------------
+    
+    // List all approved institutions with filters
+    Route::get('/instansi', [InstansiController::class, 'index']);
+    
+    // Get institution detail
+    Route::get('/instansi/{id}', [InstansiController::class, 'show']);
+    
+    // Toggle like/unlike institution
+    Route::post('/instansi/{id}/like', [LikedController::class, 'toggle']);
+    
+    // Get user's liked institutions
+    Route::get('/liked', [LikedController::class, 'index']);
+    
+    // ------------------------------------------------------------------------
+    // FORUM (HarmoTalk)
+    // ------------------------------------------------------------------------
+    
+    // Get forum posts with filters (tab, sort)
+    Route::get('/forum', [ForumController::class, 'index']);
+    
+    // Create new forum post
+    Route::post('/forum', [ForumController::class, 'store']);
+    
+    // Toggle like/unlike post
+    Route::post('/forum/{id}/like', [ForumController::class, 'like']);
+    
+    // Get post comments
+    Route::get('/forum/{id}/comments', [ForumController::class, 'getComments']);
+    
+    // Add comment to post
+    Route::post('/forum/{id}/comment', [ForumController::class, 'storeComment']);
+    
+    // ------------------------------------------------------------------------
+    // HARMOTALENT
+    // ------------------------------------------------------------------------
+    
+    // Get talent recommendations (pass bakat, kategori, sort as query params)
+    // This endpoint will use InstansiController::index with bakat filter
+    Route::get('/harmotalent/recommendations', [InstansiController::class, 'index']);
+    
+    // ------------------------------------------------------------------------
+    // PENDAFTARAN (Registration to Institution)
+    // ------------------------------------------------------------------------
+    
+    // Submit registration to institution
+    Route::post('/pendaftaran', [PendaftaranController::class, 'store']);
+    
+    // Get user's registration history
+    Route::get('/pendaftaran', function (Request $request) {
+        $pendaftaran = \App\Modules\Pendaftaran\Models\Pendaftaran::with('instansi')
+            ->where('wali_id', $request->user()->id)
+            ->latest()
+            ->get();
+            
+        return response()->json([
+            'success' => true,
+            'data' => $pendaftaran
+        ]);
+    });
+    
+    // ------------------------------------------------------------------------
+    // NOTIFICATIONS
+    // ------------------------------------------------------------------------
+    
+    // Get notifications (based on pendaftaran status changes)...
+    Route::get('/notifications', [NotifikasiController::class, 'index']);
+    
+});

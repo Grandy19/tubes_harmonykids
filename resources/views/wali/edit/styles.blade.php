@@ -6,18 +6,24 @@
     z-index:10
 }
 
-.content-scroll { 
-    padding-top: 250px; 
-    padding-left: 24px; 
-    padding-right: 24px; 
-    padding-bottom: 20px; 
-    min-height: 100vh; 
-    background: #F9FAFB;
-    overflow-y: auto; 
-    position: relative;
-    -ms-overflow-style: none; 
-    scrollbar-width: none;  
-}
+    .content-scroll {
+        /* KUNCI AGAR BISA SCROLL: */
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0; /* Memenuhi layar */
+        overflow-y: auto; /* Aktifkan scroll vertikal */
+        
+        /* Padding Anda (Tetap dipertahankan) */
+        padding-top: 240px; 
+        padding-left: 24px; 
+        padding-right: 24px; 
+        padding-bottom: 130px;
+        
+        z-index: 5; /* Pastikan di bawah header & filter */
+        
+        /* Hilangkan scrollbar (Opsional) */
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .content-scroll::-webkit-scrollbar { display: none; }
 
 .profile-img-container{
     position:relative;
@@ -119,7 +125,6 @@ select.form-control-custom{
     cursor:pointer;
 }
 
-/* ================= POPUP ================= */
 
 .frame-popup-overlay{
     position:absolute;
@@ -128,11 +133,10 @@ select.form-control-custom{
     display:flex;
     align-items:center;
     justify-content:center;
-    z-index:9999;            /* ⬅️ FIX */
+    z-index:9999;           
     pointer-events:auto;
 }
 
-/* ⬅️ INI KUNCI UTAMA */
 .frame-popup-overlay ~ .content-scroll{
     pointer-events:none;
 }

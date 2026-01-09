@@ -90,8 +90,8 @@
     </div>
 
     {{-- Footer Copyright --}}
-    <div style="text-align:center; color:#cbd5e1; font-size:11px; margin-bottom: 20px;">
-        HarmonyKids &copy; 2025
+    <div style="text-align:center; color:#cbd5e1; font-size:11px; margin-bottom: 32px;">
+        &copy; 2026 HarmonyKids App
     </div>
 
 </div>

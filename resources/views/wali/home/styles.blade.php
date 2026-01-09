@@ -1,39 +1,31 @@
 @push('styles')
 <style>
-    /* Header Fixed */
     .header-container {
         position: absolute;
         top: 0; left: 0; width: 100%; height: 300px; z-index: 10;
     }
-
     .header-bg {
         position: absolute; top: 0; left: 0; width: 100%; height: 245px;
         background: url("{{ asset('assets/images/texture.png') }}");
         background-size: cover; background-color: #3577E5;
         border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
     }
-
     .cloud-img {
         position: absolute; top: 195px; left: 0; width: 100%; height: 70px;
         object-fit: fill; z-index: 2;
     }
-
     .profile-row {
         position: absolute; top: 40px; left: 24px; right: 24px;
         display: flex; justify-content: space-between; align-items: center; z-index: 3;
     }
-
     .avatar-circle {
         width: 45px; height: 45px; border-radius: 50%; border: 2px solid white;
         background-size: cover; background-color: #ddd; display: block;
     }
-
     .user-info { margin-left: 12px; color: white; display: flex; flex-direction: column; }
     .greeting { font-size: 14px; opacity: 0.9; line-height: 1; }
     .username { font-size: 20px; font-weight: 800; line-height: 1.2; }
     .logo-img { height: 60px; }
-
-    /* Search Bar & Dropdown */
     .location-bar-wrapper {
         position: absolute; top: 115px; left: 24px; right: 24px; z-index: 20;
     }
@@ -54,14 +46,13 @@
         cursor: pointer; border-bottom: 1px solid #eee;
     }
     .dropdown-item-custom:hover { background-color: #f8f9fa; }
-
-    /* Content Scroll Area */
+    
+    /* BAGIAN INI YANG MENGATUR JARAK BAWAH */
     .content-scroll {
-        padding: 280px 24px 1px 24px; 
-        min-height: 100%; 
+        padding: 280px 24px 150px 24px;
+        min-height: 100%;
     }
-
-    /* Promo Banner */
+    
     .promo-banner {
         width: 100%; height: 160px; border-radius: 20px;
         background: linear-gradient(90deg, #3577E5 0%, #5A9BF8 100%);
@@ -77,8 +68,6 @@
     }
     .btn-banner:active { transform: translateY(2px); box-shadow: 0 2px 0 #D8D5EA; }
     .banner-img-child { position: absolute; right: 10px; bottom: 0; height: 140px; z-index: 1; }
-
-    /* Grid Menu */
     .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 15px; margin-bottom: 30px; }
     .menu-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #0F3974; transition: transform 0.2s; }
     .menu-item:hover { transform: translateY(-5px); }
@@ -88,8 +77,6 @@
     }
     .menu-icon-box img { width: 40px; height: 40px; object-fit: contain; }
     .menu-title { font-size: 13px; font-weight: 700; text-align: center; }
-
-    /* Rekomendasi Cards */
     .recom-card {
         display: flex; position: relative; background: white; border-radius: 16px;
         padding: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);

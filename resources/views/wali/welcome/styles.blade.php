@@ -1,12 +1,20 @@
 @push('styles')
 <style>
+    /* --- TAMBAHAN BARU (FIX) --- */
+    /* Ini untuk menghilangkan kotak putih di bawah */
+    .safe-bottom-padding {
+        background-color: transparent !important;
+        height: 0 !important; /* Hilangkan tingginya agar background benar-benar full */
+        padding: 0 !important;
+    }
+    
     /* 1. BACKGROUND IMAGE */
     .mobile-card {
-        background:
+        background: 
             linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.45)),
             url("{{ asset('assets/images/background.png') }}"),
             linear-gradient(180deg, #0F3974 0%, #2E7CF6 100%);
-
+            
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -14,9 +22,10 @@
 
     /* 2. KONTEN UTAMA (POSISI DI BAWAH) */
     .bottom-content {
-        margin-top: auto; /* Dorong elemen ini sampai mentok bawah */
+        margin-top: auto; 
         width: 100%;
-        padding: 24px 24px 40px 24px;
+        /* Padding bawah ditambah sedikit untuk kompensasi safe area HP */
+        padding: 24px 24px 2px 24px; 
         color: white;
     }
 

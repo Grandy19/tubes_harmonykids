@@ -1,45 +1,38 @@
 @push('styles')
 <style>
-    /* --- 1. CONTAINER UTAMA (FRAME HP) --- */
     .page-container {
         position: relative; 
         width: 100%;
-        height: 100vh; /* Tinggi penuh sesuai frame */
+        height: 100vh;
         background: #F8FAFC;
-        overflow: hidden; /* Potong apa pun yang keluar frame */
+        overflow: hidden; 
     }
 
-    /* --- 2. HEADER LAYER (Posisi Absolute) --- */
     .header-layer {
         position: absolute;
         top: 0; left: 0; right: 0;
-        height: 140px; /* Tinggi area header */
+        height: 140px; 
         z-index: 50;
         pointer-events: none;
     }
-    /* Aktifkan klik tombol di header */
     .header-layer > * { pointer-events: auto; }
 
-    /* --- 3. CONTENT AREA (Scrollable) --- */
     .content-scroll {
         position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0; /* Memenuhi container */
+        top: 0; left: 0; right: 0; bottom: 0; 
         
-        /* Padding atas agar konten mulai DI BAWAH header */
         padding-top: 240px; 
         padding-left: 20px;
         padding-right: 20px;
-        padding-bottom: 12px; /* Space untuk navbar bawah */
+        padding-bottom: 120px; 
         
-        overflow-y: auto; /* Scroll terjadi di sini */
+        overflow-y: auto; 
         z-index: 10;
         
-        /* Hilangkan scrollbar */
         -ms-overflow-style: none; scrollbar-width: none;
     }
     .content-scroll::-webkit-scrollbar { display: none; }
 
-    /* --- 4. ISI KONTEN --- */
     .instruction-text { 
         text-align: center; color: #3577E5; font-weight: 700; 
         font-size: 15px; margin-bottom: 24px; 

@@ -1,8 +1,5 @@
 @push('styles')
 <style>
-/* ======================================================
-   HEADER (SAMA PERSIS DENGAN SETTINGS)
-   ====================================================== */
 .header-layer {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -14,29 +11,20 @@
     pointer-events: auto;
 }
 
-/* ======================================================
-   CONTENT AREA (INI YANG NGATUR JARAK HEADER)
-   ====================================================== */
 .setting-content-area {
-    padding-top: 240px;      /* 🔥 UBAH DI SINI → PASTI NGARUH */
+    padding-top: 240px;     
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 10px;  /* aman dari bottom-nav */
+    padding-bottom: 32px;  
     box-sizing: border-box;
 }
 
-/* ======================================================
-   FAVORITE LIST
-   ====================================================== */
 .fav-list {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
-/* ======================================================
-   CARD
-   ====================================================== */
 .fav-card {
     background: #ffffff;
     border-radius: 18px;
@@ -50,9 +38,6 @@
     align-items: center;
 }
 
-/* ======================================================
-   THUMBNAIL
-   ====================================================== */
 .fav-thumb img {
     width: 72px;
     height: 72px;
@@ -61,9 +46,6 @@
     background: #f1f5f9;
 }
 
-/* ======================================================
-   CONTENT
-   ====================================================== */
 .fav-content {
     flex: 1;
     text-decoration: none;
@@ -92,9 +74,6 @@
     width: fit-content;
 }
 
-/* ======================================================
-   UNLIKE BUTTON
-   ====================================================== */
 .fav-like-btn {
     width: 36px;
     height: 36px;
@@ -111,9 +90,6 @@
     font-size: 16px;
 }
 
-/* ======================================================
-   EMPTY STATE
-   ====================================================== */
 .fav-empty {
     text-align: center;
     color: #94a3b8;
