@@ -103,19 +103,19 @@ Route::middleware('auth:sanctum')->group(function () {
     // ------------------------------------------------------------------------
     
     // Get forum posts with filters (tab, sort)
-    Route::get('/forum', [ForumController::class, 'index']);
+    Route::get('/forum', [App\Modules\Forum\Controllers\ForumApiController::class, 'index']);
     
     // Create new forum post
-    Route::post('/forum', [ForumController::class, 'store']);
+    Route::post('/forum', [App\Modules\Forum\Controllers\ForumApiController::class, 'store']);
     
     // Toggle like/unlike post
-    Route::post('/forum/{id}/like', [ForumController::class, 'like']);
+    Route::post('/forum/{id}/like', [App\Modules\Forum\Controllers\ForumApiController::class, 'like']);
     
     // Get post comments
-    Route::get('/forum/{id}/comments', [ForumController::class, 'getComments']);
+    Route::get('/forum/{id}/comments', [App\Modules\Forum\Controllers\ForumApiController::class, 'getComments']);
     
     // Add comment to post
-    Route::post('/forum/{id}/comment', [ForumController::class, 'storeComment']);
+    Route::post('/forum/{id}/comment', [App\Modules\Forum\Controllers\ForumApiController::class, 'storeComment']);
     
     // ------------------------------------------------------------------------
     // HARMOTALENT

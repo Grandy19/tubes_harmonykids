@@ -60,7 +60,7 @@ class AuthController extends Controller
                         'email' => $user->email,
                         'role'  => $user->role,
                     ],
-                    // 'token' => $token // Uncomment kalau pakai Sanctum
+                    // 'token' => $token 
                 ], 200);
             }
 

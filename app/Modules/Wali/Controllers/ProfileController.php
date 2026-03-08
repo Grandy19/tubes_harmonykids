@@ -75,6 +75,14 @@ class ProfileController extends Controller
         
         $user->save();
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil berhasil diperbarui!',
+                'data' => $user
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Profil berhasil diperbarui!');
     }
 }

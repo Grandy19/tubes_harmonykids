@@ -6,15 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Modules\Forum\Models\ForumPost;
-use App\Modules\Forum\Models\ForumComment; // Pastikan Model ini ada
-use App\Modules\Forum\Models\ForumLike;    // Pastikan Model ini ada
+use App\Modules\Forum\Models\ForumComment;
+use App\Modules\Forum\Models\ForumLike;
 
-class ForumController extends Controller
+class ForumApiController extends Controller
 {
-    // TAMPILKAN HALAMAN UTAMA (Gabungan Index & Mine)
+    // GET /api/forum - Get all posts
     public function index(Request $request)
     {
-        // Ambil parameter dari URL (default 'all' dan 'latest')
         $tab = $request->query('tab', 'all');
         $sort = $request->query('sort', 'latest');
         
@@ -38,73 +37,63 @@ class ForumController extends Controller
             }
         }
 
-        // Query Dasar dengan Eager Loading (Wali & Hitung Komentar)
-        // Filter hanya posts yang wali-nya masih ada (tidak null)
+        // Debug logging
+        \Log::info('Forum API called', [
+            'tab' => $tab,
+            'sort' => $sort,
+            'user_id' => $userId ?? 'NULL',
+            'user_name' => $user ? $user->name : 'NULL',
+            'auth_check' => Auth::check() ? 'YES' : 'NO',
+        ]);
+
+        // Query posts dengan wali relation
         $query = ForumPost::with('wali')
-            ->whereHas('wali')
+            ->whereHas('wali') // Only posts with valid wali
             ->withCount('comments');
 
-        // Filter: Post Saya (only if user is authenticated)
+        // Filter by tab (only if user is authenticated)
         if ($tab === 'mine' && $userId) {
             $query->where('wali_id', $userId);
+            \Log::info('Filtering by wali_id', ['wali_id' => $userId]);
         }
 
-        // Logic Sorting 
+        // Sorting
         if ($sort === 'popular') {
-            $query->orderByDesc('likes'); 
+            $query->orderByDesc('likes');
         } elseif ($sort === 'recommend') {
             $query->orderByDesc('likes')->latest();
         } else {
             $query->latest();
         }
 
-        // Eksekusi Query
         $posts = $query->get();
 
-        // Ambil ID postingan yang sudah dilike oleh user ini (untuk tombol merah/abu)
-        // Use empty array if user is null
-        $likedPostIds = $user 
+        // Get liked post IDs for current user (use empty array if user is null)
+        $likedPostIds = $user
             ? ForumLike::where('user_id', $user->id)->pluck('forum_post_id')->toArray()
             : [];
 
-        // Check if API request (for mobile app)
-        if ($request->expectsJson() || $request->is('api/*')) {
-            // Transform posts untuk API response
-            $postsData = $posts->map(function ($post) use ($likedPostIds) {
-                // Skip if wali is null (safety check)
-                if (!$post->wali) {
-                    return null;
-                }
-                
-                return [
-                    'id' => $post->id,
-                    'wali_id' => $post->wali_id,
-                    'content' => $post->content,
-                    'image' => $post->image,
-                    'likes' => $post->likes,
-                    'comments_count' => $post->comments_count,
-                    'created_at' => $post->created_at->toISOString(),
-                    'wali' => [
-                        'name' => $post->wali->name,
-                    ],
-                    'is_liked' => in_array($post->id, $likedPostIds),
-                ];
-            })->filter()->values(); // Remove null entries and reindex
+        // Transform to API response
+        $data = $posts->map(function ($post) use ($likedPostIds) {
+            return [
+                'id' => $post->id,
+                'wali_id' => $post->wali_id,
+                'content' => $post->content,
+                'image' => $post->image,
+                'likes' => $post->likes ?? 0,
+                'comments_count' => $post->comments_count ?? 0,
+                'created_at' => $post->created_at->toISOString(),
+                'wali' => [
+                    'name' => $post->wali->name ?? 'User',
+                ],
+                'is_liked' => in_array($post->id, $likedPostIds),
+            ];
+        });
 
-            return response()->json($postsData);
-        }
-
-        // Return ke View untuk web
-        return view('wali.harmotalk.index', compact('posts', 'tab', 'sort', 'likedPostIds'));
+        return response()->json($data);
     }
 
-    // HALAMAN FORM CREATE (Jika view dipisah)
-    public function create()
-    {
-        return view('wali.harmotalk.create');
-    }
-
-    // SIMPAN POST BARU
+    // POST /api/forum - Create new post
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -117,33 +106,33 @@ class ForumController extends Controller
         }
 
         $data['wali_id'] = Auth::id();
-        $data['likes'] = 0; // Inisialisasi counter
+        $data['likes'] = 0;
 
-        ForumPost::create($data);
+        $post = ForumPost::create($data);
 
-        // Redirect kembali ke halaman forum dengan tab 'all'
-        return redirect()->route('wali.harmotalk', ['tab' => 'all'])
-            ->with('success', 'Postingan berhasil diterbitkan!');
+        return response()->json([
+            'message' => 'Post created successfully',
+            'post' => $post
+        ], 201);
     }
 
-    // 4. LOGIKA LIKE (AJAX)
+    // POST /api/forum/{id}/like - Toggle like
     public function like($id)
     {
         $user = Auth::user();
         $post = ForumPost::findOrFail($id);
 
-        // Cek apakah user sudah like
         $existingLike = ForumLike::where('user_id', $user->id)
             ->where('forum_post_id', $post->id)
             ->first();
 
         if ($existingLike) {
-            // UNLIKE: Hapus data like & Kurangi counter
+            // Unlike
             $existingLike->delete();
             $post->decrement('likes');
             $isLiked = false;
         } else {
-            // LIKE: Buat data like & Tambah counter
+            // Like
             ForumLike::create([
                 'user_id' => $user->id,
                 'forum_post_id' => $post->id
@@ -152,14 +141,13 @@ class ForumController extends Controller
             $isLiked = true;
         }
 
-        // Return JSON untuk JS fetch()
         return response()->json([
             'liked' => $isLiked,
             'likes' => $post->likes
         ]);
     }
 
-    // AMBIL KOMENTAR (AJAX)
+    // GET /api/forum/{id}/comments - Get comments
     public function getComments($id)
     {
         $comments = ForumComment::with('wali')
@@ -168,6 +156,7 @@ class ForumController extends Controller
             ->get()
             ->map(function ($c) {
                 return [
+                    'id' => $c->id,
                     'name' => $c->wali->name ?? 'User',
                     'content' => $c->content,
                     'time' => $c->created_at->diffForHumans()
@@ -177,7 +166,7 @@ class ForumController extends Controller
         return response()->json($comments);
     }
 
-    // KIRIM KOMENTAR (AJAX)
+    // POST /api/forum/{id}/comment - Add comment
     public function storeComment(Request $request, $id)
     {
         $request->validate(['comment' => 'required']);
@@ -190,11 +179,11 @@ class ForumController extends Controller
             'content' => $request->comment
         ]);
 
-        // Return JSON agar JS bisa append komentar baru tanpa refresh
         return response()->json([
             'status' => 'success',
             'comments_count' => $post->comments()->count(),
             'comment' => [
+                'id' => $comment->id,
                 'name' => Auth::user()->name,
                 'content' => $comment->content,
                 'time' => 'baru saja'

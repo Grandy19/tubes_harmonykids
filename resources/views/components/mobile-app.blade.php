@@ -62,7 +62,7 @@
             .mobile-card {
                 height: 100vh;
                 border-radius: 24px;
-                border: 3px solid #222;
+                border: 3px solid #b3b3b3;
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
             }
         }
