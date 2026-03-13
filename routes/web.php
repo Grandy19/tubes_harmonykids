@@ -83,6 +83,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wali/harmoview', fn () => view('wali.harmoview.index'))
         ->name('wali.harmoview');
 
+    Route::get('/wali/harmoride', fn () => view('wali.harmoride.index'))
+        ->name('wali.harmoride');
+
+    Route::get('/wali/harmotale', fn () => view('wali.harmotale.index'))
+        ->name('wali.harmotale');
+
+    Route::get('/wali/harmotale/baca', fn () => view('wali.harmotale.baca.index'))
+        ->name('wali.harmotale.baca');
+
     Route::get('/wali/harmotalent', [HarmoTalentController::class, 'index'])
         ->name('wali.harmotalent');
 

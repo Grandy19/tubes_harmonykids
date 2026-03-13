@@ -69,11 +69,11 @@
             <div class="menu-icon-box"><img src="{{ asset('assets/images/talk.png') }}" alt="Talk"></div>
             <div class="menu-title">HarmoTalk</div>
         </a>
-        <a href="#" class="menu-item">
+        <a href="{{ route('wali.harmoride') }}" class="menu-item">
             <div class="menu-icon-box"><img src="{{ asset('assets/images/ride.png') }}" alt="Ride"></div>
             <div class="menu-title">HarmoRide</div>
         </a>
-        <a href="#" class="menu-item">
+        <a href="{{ route('wali.harmotale') }}" class="menu-item">
             <div class="menu-icon-box"><img src="{{ asset('assets/images/tale.png') }}" alt="Tale"></div>
             <div class="menu-title">HarmoTale</div>
         </a>
